@@ -6,7 +6,7 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#16202a}
 header{background:#10243a;color:#fff;padding:18px;text-align:center}header h1{margin:0;font-size:24px}.tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:14px}.tab{border:0;border-radius:8px;padding:10px 15px;font-weight:bold;cursor:pointer;background:#28445f;color:#fff}.tab.active{background:#fff;color:#10243a}
-main{max-width:1200px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 10px #0001}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}input,select,button{padding:12px;border:1px solid #ccd5df;border-radius:8px;font-size:15px}button{cursor:pointer;font-weight:bold}.primary{background:#1266d6;color:#fff;border:0}.green{background:#159447;color:#fff;border:0}.orange{background:#e58016;color:#fff;border:0}.red{background:#d83b3b;color:#fff;border:0}.gray{background:#64748b;color:#fff;border:0}
+main{max-width:1200px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 10px #0001}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}input,select,button{padding:12px;border:1px solid #ccd5df;border-radius:8px;font-size:15px}button{cursor:pointer;font-weight:bold}.primary{background:#1266d6;color:#fff;border:0}.green{background:#159447;color:#fff;border:0}.orange{background:#e58016;color:#fff;border:0}.red{background:#d83b3b;color:#fff;border:0}.gray{background:#64748b;color:#fff;border:0}
 .vehicle{border:1px solid #d9e1e8;border-radius:12px;padding:14px;margin:10px 0;background:#fff}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.vehicle-number{font-size:24px;font-weight:900}.token{font-size:12px;font-weight:bold;color:#64748b}.model{font-size:17px;margin-top:4px}.techline{margin-top:8px;color:#475569}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{padding:8px 12px}.empty{text-align:center;padding:25px;color:#718096}.tech-grid,.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tech-card,.report-card{border:1px solid #d9e1e8;border-radius:14px;padding:15px}.status{font-size:12px;font-weight:bold;padding:5px 8px;border-radius:20px;display:inline-block}.available{background:#dff7e7;color:#087a35}.busy{background:#fff0d8;color:#9a5a00}.att{margin:10px 0;padding:10px;background:#f6f8fb;border-radius:10px;font-size:13px;line-height:1.8}.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#fff;border-radius:12px;padding:15px;text-align:center}.stat b{font-size:30px;display:block}
 .tv{background:#06131f;color:#fff;min-height:calc(100vh - 130px);padding:25px;border-radius:16px}.tv h2{text-align:center;font-size:30px}.now{border:3px solid #278bd0;border-radius:22px;padding:30px;text-align:center;background:#0d2438}.tv-token{font-size:20px}.tv-vehicle{font-size:clamp(48px,9vw,130px);font-weight:900;word-break:break-word}.tv-model{font-size:clamp(28px,4vw,60px);font-weight:900;margin-top:8px}.tv-tech{font-size:clamp(20px,2.5vw,34px);margin-top:18px}.waitrow{display:grid;grid-template-columns:130px 1fr 240px;gap:15px;align-items:center;padding:16px;margin:10px 0;background:#13283a;border-radius:14px}.waitvehicle{font-size:28px;font-weight:900}
 .small{font-size:13px;color:#64748b}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.tech-grid,.report-grid{grid-template-columns:1fr}.statgrid{grid-template-columns:1fr 1fr}.waitrow{grid-template-columns:1fr}.waitrow .tv-tech{font-size:16px}}@media(max-width:500px){.grid{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}}
@@ -134,8 +134,8 @@ $("addBtn").onclick=async()=>{
     ...Object.values(done).filter(v=>(v.tokenDate||day(v.createdAt||v.completedAt))===today)
   ].map(v=>Number(v.token)||0);
   const max=Math.max(0,...todayTokens);
-  const item={token:max+1,tokenDate:today,vehicle,model,technician,status:"waiting",createdAt:Date.now()};
- try{await set(push(ref(db,Q)),item);$("vehicleInput").value="";$("modelInput").value="";$("techSelect").value=""}catch(e){alert("Cannot save vehicle: "+e.message)}
+  const item={token:max+1,tokenDate:today,vehicle,model,service,technician,status:"waiting",createdAt:Date.now()};
+ try{await set(push(ref(db,Q)),item);$("vehicleInput").value="";$("modelInput").value="";$("serviceSelect").value="";$("techSelect").value=""}catch(e){alert("Cannot save vehicle: "+e.message)}
 };
 window.startService=async id=>{
  const current=Object.values(queue).find(v=>v.status==="serving");
@@ -147,11 +147,18 @@ window.completeVehicle=async id=>{
  try{await set(ref(db,D+"/"+id),{...v,status:"completed",completedAt:Date.now()});await remove(ref(db,Q+"/"+id))}catch(e){alert("Complete failed: "+e.message)}
 };
 window.changeTech=async(id,name)=>{try{await update(ref(db,Q+"/"+id),{technician:name})}catch(e){alert(e.message)}};
+window.changeService=async(id,service)=>{try{await update(ref(db,Q+"/"+id),{service})}catch(e){alert(e.message)}};
 window.removeVehicle=async id=>{if(confirm("Remove this vehicle?"))try{await remove(ref(db,Q+"/"+id))}catch(e){alert(e.message)}};
 
 function card(id,v){
- const serving=v.status==="serving";
- return `<div class="vehicle"><div class="row"><div><div class="token">TOKEN #${v.token}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div><div class="techline">👨‍🔧 <select onchange="changeTech('${id}',this.value)">${techs.map(t=>`<option value="${esc(t)}" ${t===v.technician?"selected":""}>${esc(t)}</option>`).join("")}</select></div></div><span class="status ${serving?"busy":"available"}">${serving?"SERVING":"WAITING"}</span></div><div class="actions">${serving?`<button class="green" onclick="completeVehicle('${id}')">COMPLETE</button>`:`<button class="orange" onclick="startService('${id}')">START SERVICE</button>`}<button class="red" onclick="removeVehicle('${id}')">REMOVE</button></div></div>`;
+  const serving=v.status==="serving";
+  return `<div class="vehicle"><div class="row"><div><div class="token">TOKEN #${v.token}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div>
+  <div class="techline">🔧 Service: <select onchange="changeService('${id}',this.value)">
+  ${["New Tyre","Alignment","Alignment + Balancing"].map(s=>`<option value="${esc(s)}" ${s===v.service?"selected":""}>${esc(s)}</option>`).join("")}
+  </select></div>
+  <div class="techline">👨‍🔧 Technician: <select onchange="changeTech('${id}',this.value)">${techs.map(t=>`<option value="${esc(t)}" ${t===v.technician?"selected":""}>${esc(t)}</option>`).join("")}</select></div>
+  </div><span class="status ${serving?"busy":"available"}">${serving?"SERVING":"WAITING"}</span></div>
+  <div class="actions">${serving?`<button class="green" onclick="completeVehicle('${id}')">COMPLETE</button>`:`<button class="orange" onclick="startService('${id}')">START SERVICE</button>`}<button class="red" onclick="removeVehicle('${id}')">REMOVE</button></div></div>`;
 }
 function renderQueue(){
  const arr=Object.entries(queue).sort((a,b)=>a[1].token-b[1].token);
@@ -164,8 +171,8 @@ function renderQueue(){
 }
 function renderTV(serving,waiting){
  const v=serving[0]?.[1];
- $("tvServing").innerHTML=v?`<div class="tv-token">TOKEN #${v.token}</div><div class="tv-vehicle">${esc(v.vehicle)}</div><div class="tv-model">${esc(v.model)}</div><div class="tv-tech">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div>`:'<div class="empty" style="color:white">WAITING FOR NEXT VEHICLE</div>';
- $("tvWaiting").innerHTML=waiting.length?waiting.map(([,x])=>`<div class="waitrow"><b>TOKEN #${x.token}</b><div><div class="waitvehicle">${esc(x.vehicle)}</div><div>${esc(x.model)}</div></div><div class="tv-tech">👨‍🔧 ${esc(x.technician||"Not Assigned")}</div></div>`).join(""):'<div class="empty" style="color:white">NO WAITING VEHICLES</div>';
+ $("tvServing").innerHTML=v?`<div class="tv-token">TOKEN #${v.token}</div><div class="tv-vehicle">${esc(v.vehicle)}</div><div class="tv-model">${esc(v.model)}</div><div class="tv-tech">🔧 ${esc(v.service||"Service Not Selected")}</div><div class="tv-tech">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div>`:'<div class="empty" style="color:white">WAITING FOR NEXT VEHICLE</div>';
+ $("tvWaiting").innerHTML=waiting.length?waiting.map(([,x])=>`<div class="waitrow"><b>TOKEN #${x.token}</b><div><div class="waitvehicle">${esc(x.vehicle)}</div><div>${esc(x.model)}</div><div>🔧 ${esc(x.service||"Service Not Selected")}</div></div><div class="tv-tech">👨‍🔧 ${esc(x.technician||"Not Assigned")}</div></div>`).join(""):'<div class="empty" style="color:white">NO WAITING VEHICLES</div>';
 }
 $("addTechBtn").onclick=async()=>{const n=$("newTech").value.trim();if(!n)return;if(techs.some(x=>x.toLowerCase()===n.toLowerCase()))return alert("Already exists.");await set(ref(db,T+"/"+encodeURIComponent(n)),{name:n});$("newTech").value=""};
 window.checkIn=async n=>{const k=day();if(attendance[k]?.[n]?.checkIn)return;await update(ref(db,A+"/"+k+"/"+encodeURIComponent(n)),{checkIn:Date.now(),checkOut:null})};
@@ -180,7 +187,7 @@ function renderCompletedRecords(){
  const q=(($("recordSearch")?.value)||"").trim().toLowerCase();
  const filterDate=($("recordDate")?.value)||"";
  const rows=Object.values(done).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0)).filter(v=>{
-   const hay=[v.vehicle,v.model,v.technician,v.token].join(" ").toLowerCase();
+   const hay=[v.vehicle,v.model,v.service,v.technician,v.token].join(" ").toLowerCase();
    return (!q||hay.includes(q)) && (!filterDate||day(v.completedAt||v.createdAt)===filterDate);
  });
  box.innerHTML=rows.length?rows.map(v=>{
@@ -193,7 +200,7 @@ function renderCompletedRecords(){
    }
    return `<div class="vehicle">
      <div class="row">
-       <div><div class="token">TOKEN #${esc(v.token)}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div><div class="techline">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div></div>
+       <div><div class="token">TOKEN #${esc(v.token)}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div><div class="techline">🔧 ${esc(v.service||"Service Not Selected")}</div><div class="techline">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div></div>
        <span class="status available">COMPLETED</span>
      </div>
      <div class="att">🕐 Start: <b>${start}</b> &nbsp; | &nbsp; ✅ Completed: <b>${end}</b> &nbsp; | &nbsp; ⏱️ Duration: <b>${duration}</b><br>📅 Date: <b>${esc(day(v.completedAt||v.createdAt))}</b></div>
