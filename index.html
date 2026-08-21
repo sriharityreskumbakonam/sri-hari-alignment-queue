@@ -1,17 +1,217 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sri Hari Tyres - Live Alignment Queue</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sri Hari Tyres SmartQueue</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}header{background:#151515;border-bottom:3px solid #e31b23;padding:22px;text-align:center}.logo{font-size:30px;font-weight:900}.sub{color:#aaa;letter-spacing:2px;font-size:13px}.wrap{max-width:1100px;margin:auto;padding:22px}.card{background:#171717;border-radius:16px;padding:22px;margin-bottom:18px}.row{display:flex;gap:12px;flex-wrap:wrap}input,select{flex:1;min-width:210px;background:#0d0d0d;color:#fff;border:1px solid #444;border-radius:10px;padding:15px;font-size:17px}button{border:0;border-radius:10px;padding:14px 18px;font-weight:800;font-size:15px}.add{background:#e31b23;color:#fff}.white{background:#fff;color:#111}.dark{background:#444;color:#fff}.status{padding:10px;border-radius:8px;background:#222;color:#aaa;margin-bottom:15px}.item{display:flex;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid #333}.num{font-size:20px;font-weight:800}.model,.tech{color:#aaa}.tech{margin-top:4px}.tv{text-align:center;min-height:100vh;background:#080808}.tv header{padding:28px}.tv .logo{font-size:42px}.tv .wrap{max-width:1450px}.tvcard{background:#141414;border-radius:24px;padding:35px;border:2px solid #e31b23}.now{font-size:76px;font-weight:900;margin-top:15px}.next{margin-top:22px;background:#141414;border-radius:20px;padding:25px}.nextnum{font-size:45px;font-weight:900}.tvtech{font-size:22px;color:#aaa;margin-top:8px}.wait{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.wait div{background:#161616;padding:18px;border-radius:12px;font-size:25px}.small{font-size:12px;color:#888;margin-top:12px}@media(max-width:700px){.now{font-size:48px}.nextnum{font-size:32px}.wait{grid-template-columns:1fr}}
-</style></head><body><div id="app"></div>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#16202a}
+header{background:#10243a;color:#fff;padding:18px;text-align:center}header h1{margin:0;font-size:24px}.tabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:14px}.tab{border:0;border-radius:8px;padding:10px 15px;font-weight:bold;cursor:pointer;background:#28445f;color:#fff}.tab.active{background:#fff;color:#10243a}
+main{max-width:1200px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 10px #0001}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}input,select,button{padding:12px;border:1px solid #ccd5df;border-radius:8px;font-size:15px}button{cursor:pointer;font-weight:bold}.primary{background:#1266d6;color:#fff;border:0}.green{background:#159447;color:#fff;border:0}.orange{background:#e58016;color:#fff;border:0}.red{background:#d83b3b;color:#fff;border:0}.gray{background:#64748b;color:#fff;border:0}
+.vehicle{border:1px solid #d9e1e8;border-radius:12px;padding:14px;margin:10px 0;background:#fff}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.vehicle-number{font-size:24px;font-weight:900}.token{font-size:12px;font-weight:bold;color:#64748b}.model{font-size:17px;margin-top:4px}.techline{margin-top:8px;color:#475569}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{padding:8px 12px}.empty{text-align:center;padding:25px;color:#718096}.tech-grid,.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tech-card,.report-card{border:1px solid #d9e1e8;border-radius:14px;padding:15px}.status{font-size:12px;font-weight:bold;padding:5px 8px;border-radius:20px;display:inline-block}.available{background:#dff7e7;color:#087a35}.busy{background:#fff0d8;color:#9a5a00}.att{margin:10px 0;padding:10px;background:#f6f8fb;border-radius:10px;font-size:13px;line-height:1.8}.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#fff;border-radius:12px;padding:15px;text-align:center}.stat b{font-size:30px;display:block}
+.tv{background:#06131f;color:#fff;min-height:calc(100vh - 130px);padding:25px;border-radius:16px}.tv h2{text-align:center;font-size:30px}.now{border:3px solid #278bd0;border-radius:22px;padding:30px;text-align:center;background:#0d2438}.tv-token{font-size:20px}.tv-vehicle{font-size:clamp(48px,9vw,130px);font-weight:900;word-break:break-word}.tv-model{font-size:clamp(28px,4vw,60px);font-weight:900;margin-top:8px}.tv-tech{font-size:clamp(20px,2.5vw,34px);margin-top:18px}.waitrow{display:grid;grid-template-columns:130px 1fr 240px;gap:15px;align-items:center;padding:16px;margin:10px 0;background:#13283a;border-radius:14px}.waitvehicle{font-size:28px;font-weight:900}
+.small{font-size:13px;color:#64748b}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.tech-grid,.report-grid{grid-template-columns:1fr}.statgrid{grid-template-columns:1fr 1fr}.waitrow{grid-template-columns:1fr}.waitrow .tv-tech{font-size:16px}}@media(max-width:500px){.grid{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}}
+
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#10243a,#1d5d8f);padding:20px}
+.login-box{width:min(420px,100%);background:#fff;border-radius:22px;padding:30px;box-shadow:0 20px 60px #0004}
+.login-box h1{font-size:25px;color:#10243a;text-align:center}.login-box p{text-align:center;color:#64748b}
+.login-box input{width:100%;margin:8px 0}.login-box button{width:100%;margin-top:10px}.login-error{color:#c62828;font-size:14px;min-height:20px;text-align:center;margin-top:8px}
+#appShell{display:none}
+</style>
+</head>
+<body>
+<div id="loginScreen" class="login-screen">
+ <div class="login-box">
+  <h1>🚗 SRI HARI TYRES</h1><p>SMART QUEUE LOGIN</p>
+  <input id="loginEmail" type="email" placeholder="Email address" autocomplete="email">
+  <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="primary" id="loginBtn">LOGIN</button>
+  <button class="gray" id="forgotBtn">FORGOT PASSWORD</button>
+  <div id="loginError" class="login-error"></div>
+ </div>
+</div>
+<div id="appShell"><header><h1>🚗 SRI HARI TYRES — SMART QUEUE</h1>
+<div style="margin-top:10px"><button id="logoutBtn" class="gray" style="padding:7px 14px">LOGOUT</button></div><div class="tabs">
+<button class="tab active" data-page="staff">STAFF CONTROL</button>
+<button class="tab" data-page="tech">TECHNICIANS</button>
+<button class="tab" data-page="reports">REPORTS</button>
+<button class="tab" data-page="tv">TV DISPLAY</button>
+</div></header>
+<main>
+<section id="staff" class="page active">
+<div class="card"><h2>Add Vehicle</h2><div class="grid">
+<input id="vehicleInput" placeholder="Vehicle Number">
+<input id="modelInput" placeholder="Car Model">
+<select id="techSelect"></select>
+<button class="primary" id="addBtn">ADD VEHICLE</button>
+</div><p class="small">Token number is generated automatically and resets to <b>1 every day</b>.</p></div>
+<div class="card"><h2>🔧 SERVING VEHICLE</h2><div id="servingList"></div></div>
+<div class="card"><h2>⏳ WAITING VEHICLES</h2><div id="waitingList"></div></div>
+</section>
+<section id="tech" class="page">
+<div class="card"><h2>Technician Management</h2><div class="row"><input id="newTech" placeholder="Technician name"><button class="primary" id="addTechBtn">ADD TECHNICIAN</button></div></div>
+<div class="card"><h2>Technicians & Attendance</h2><div id="techGrid" class="tech-grid"></div></div>
+</section>
+<section id="reports" class="page">
+<div class="statgrid"><div class="stat"><b id="activeCount">0</b>Active</div><div class="stat"><b id="servingCount">0</b>Serving</div><div class="stat"><b id="waitingCount">0</b>Waiting</div><div class="stat"><b id="doneCount">0</b>Total Done</div></div>
+<div class="card"><h2>Technician-wise Performance</h2><div id="reportGrid" class="report-grid"></div></div>
+<div class="card">
+  <div class="row"><div><h2 style="margin-bottom:4px">✅ Completed Vehicle Records</h2><div class="small">Search and view completed service history.</div></div></div>
+  <div class="grid" style="margin-top:14px;grid-template-columns:2fr 1fr 1fr">
+    <input id="recordSearch" placeholder="Search Vehicle Number / Model / Technician">
+    <input id="recordDate" type="date">
+    <button class="gray" id="clearRecordFilter">CLEAR FILTER</button>
+  </div>
+  <div id="completedRecords" style="margin-top:15px"></div>
+</div>
+</section>
+<section id="tv" class="page tv">
+<h2>🔧 NOW SERVICING</h2><div class="now" id="tvServing"></div>
+<h2 style="margin-top:35px">⏳ WAITING VEHICLES</h2><div id="tvWaiting"></div>
+</section>
+</main></div>
+
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import{getDatabase,ref,onValue,set}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-const saved=localStorage.getItem("sht_firebase_config");let cfg=null;try{cfg=JSON.parse(saved||"null")}catch(e){}
-if(!cfg||!cfg.databaseURL||String(cfg.apiKey||"").startsWith("PASTE_"))setup();else start();
-function setup(){document.body.innerHTML=`<header><div class="logo">SRI HARI TYRES</div><div class="sub">LIVE ALIGNMENT QUEUE</div></header><div class="wrap"><div class="card"><h2>Firebase Setup</h2><p>Paste the Firebase Web App configuration from your Firebase project.</p><textarea id="cfg" style="width:100%;height:220px;background:#0d0d0d;color:#fff;border:1px solid #444;border-radius:10px;padding:14px;font-family:monospace"></textarea><br><br><button class="add" id="save">SAVE & CONNECT</button><div class="small">Saved only in this browser.</div></div></div>`;document.getElementById("cfg").value=localStorage.getItem("sht_firebase_config")||`{"apiKey":"PASTE_API_KEY","authDomain":"YOUR_PROJECT.firebaseapp.com","databaseURL":"https://YOUR_PROJECT-default-rtdb.firebaseio.com","projectId":"YOUR_PROJECT_ID","storageBucket":"YOUR_PROJECT.appspot.com","messagingSenderId":"YOUR_SENDER_ID","appId":"YOUR_APP_ID"}`;document.getElementById("save").onclick=()=>{try{JSON.parse(document.getElementById("cfg").value);localStorage.setItem("sht_firebase_config",document.getElementById("cfg").value);location.reload()}catch(e){alert("Invalid JSON")}}}
-function start(){const db=getDatabase(initializeApp(cfg)),qref=ref(db,"sriHariTyres/alignmentQueue");let queue=[];onValue(qref,s=>{queue=s.val()||[];render();renderTV()});const technicians=["Aravind","Arjun","Arivazhagan","Sarath","Venkatesh","Vijay"];const mode=new URLSearchParams(location.search).get("mode");if(mode==="tv")tv();else staff();function write(){return set(qref,queue)}function add(){let v=document.getElementById("vehicle").value.trim().toUpperCase(),m=document.getElementById("model").value.trim(),t=document.getElementById("tech").value;if(!v||!m||!t)return alert("Enter vehicle number, model and technician");queue=[...queue,{id:Date.now(),vehicle:v,model:m,technician:t}];write();document.getElementById("vehicle").value="";document.getElementById("model").value=""}function complete(){if(queue.length){queue=queue.slice(1);write()}}function callNext(){if(queue.length>1){queue=[...queue.slice(1),queue[0]];write()}}function clearAll(){if(confirm("Clear the whole queue?")){queue=[];write()}}
-function staff(){document.body.innerHTML=`<header><div class="logo">SRI HARI TYRES</div><div class="sub">CEAT • LIVE WHEEL ALIGNMENT QUEUE</div></header><div class="wrap"><div class="card"><div class="status">🟢 LIVE QUEUE CONNECTED</div><h2>Add Vehicle</h2><div class="row"><input id="vehicle" placeholder="Vehicle Number • TN 49 AB 1234"><input id="model" placeholder="Model • Tata Punch"><select id="tech"><option value="">Select Technician</option>${technicians.map(x=>`<option>${x}</option>`).join("")}</select><button class="add" id="add">ADD TO QUEUE</button></div><div class="small">TV display: open the same website with <b>?mode=tv</b></div></div><div class="card"><h2>Live Queue</h2><div id="list"></div><div class="row" style="margin-top:16px"><button class="white" id="complete">COMPLETED</button><button class="dark" id="next">CALL NEXT</button><button class="dark" id="clear">CLEAR ALL</button></div></div></div>`;document.getElementById("add").onclick=add;document.getElementById("complete").onclick=complete;document.getElementById("next").onclick=callNext;document.getElementById("clear").onclick=clearAll;render()}
-function render(){let list=document.getElementById("list");if(!list)return;list.innerHTML=queue.length?queue.map((x,i)=>`<div class="item"><div><div class="num">${i===0?"🟢 ":""}${x.vehicle}</div><div class="model">${x.model}</div><div class="tech">👨‍🔧 ${x.technician}</div></div><b>${i===0?"NOW":i===1?"NEXT":"WAITING"}</b></div>`).join(""):"<div class='model'>No vehicles waiting.</div>"}
-function tv(){document.body.className="tv";document.body.innerHTML=`<header><div class="logo">SRI HARI TYRES</div><div class="sub">CEAT • WHEEL ALIGNMENT</div></header><div class="wrap"><div class="tvcard"><div class="sub">NOW SERVING</div><div id="now"></div></div><div class="next"><div class="sub">NEXT VEHICLE</div><div id="next"></div></div><h2>WAITING QUEUE</h2><div class="wait" id="wait"></div></div>`;renderTV()}
-function renderTV(){let n=document.getElementById("now");if(!n)return;if(!queue.length){n.innerHTML="<div class='now'>NO VEHICLE</div>";document.getElementById("next").innerHTML="<div class='nextnum'>—</div>";document.getElementById("wait").innerHTML="";return}n.innerHTML=`<div class="now">${queue[0].vehicle}</div><div class="nextnum" style="font-size:28px;color:#bbb">${queue[0].model}</div><div class="tvtech">👨‍🔧 Technician: ${queue[0].technician}</div>`;document.getElementById("next").innerHTML=queue[1]?`<div class="nextnum">${queue[1].vehicle}</div><div class="tvtech">${queue[1].model} • 👨‍🔧 ${queue[1].technician}</div>`:"<div class='nextnum'>—</div>";document.getElementById("wait").innerHTML=queue.slice(2).map(x=>`<div><b>${x.vehicle}</b><br><span class="model">${x.model}</span><br><span class="tech">👨‍🔧 ${x.technician}</span></div>`).join("")}}
-</script></body></html>
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getDatabase,ref,onValue,push,set,update,remove} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,sendPasswordResetEmail,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyCax3wDlyYqQIe8BQ9pABJE7rXH8Qpb1YU",
+ authDomain:"alignment-queue-24c11.firebaseapp.com",
+ databaseURL:"https://alignment-queue-24c11-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"alignment-queue-24c11",
+ storageBucket:"alignment-queue-24c11.firebasestorage.app",
+ messagingSenderId:"923890845988",
+ appId:"1:923890845988:web:4b5dbd733cedb6600d4bb1"
+};
+const app=initializeApp(firebaseConfig),db=getDatabase(app),auth=getAuth(app);
+const Q="smartQueueClean/queue",T="smartQueueClean/technicians",D="smartQueueClean/completed",A="smartQueueClean/attendance";
+const defaults=["Aravind","Arjun","Arivazhagan","Sarath","Venkatesh","Vijay"];
+let queue={},techs=[],done={},attendance={};
+
+
+const $=id=>document.getElementById(id);
+function showLoginError(msg){$("loginError").textContent=msg||""}
+$("loginBtn").onclick=async()=>{
+ const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+ if(!email||!password)return showLoginError("Enter your email and password.");
+ showLoginError("Logging in...");
+ try{await signInWithEmailAndPassword(auth,email,password);showLoginError("")}
+ catch(e){
+   console.error(e);
+   const msg=e.code==="auth/invalid-credential"?"Incorrect email or password.":e.message;
+   showLoginError(msg);
+ }
+};
+$("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginBtn").click()});
+$("forgotBtn").onclick=async()=>{
+ const email=$("loginEmail").value.trim();
+ if(!email)return showLoginError("Enter your email first, then tap Forgot Password.");
+ try{await sendPasswordResetEmail(auth,email);showLoginError("Password reset email sent. Check your inbox.")}
+ catch(e){showLoginError(e.message)}
+};
+$("logoutBtn").onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{
+ $("loginScreen").style.display=user?"none":"flex";
+ $("appShell").style.display=user?"block":"none";
+ if(user) $("loginPassword").value="";
+});
+
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+function day(ts=Date.now()){const d=new Date(ts);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function time(ts){return ts?new Date(ts).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):"—"}
+function renderSelect(){const old=$("techSelect").value;$("techSelect").innerHTML='<option value="">Select Technician</option>'+techs.map(t=>`<option>${esc(t)}</option>`).join("");if(techs.includes(old))$("techSelect").value=old}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab,.page").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.page).classList.add("active")});
+
+$("addBtn").onclick=async()=>{
+ const vehicle=$("vehicleInput").value.trim().toUpperCase(),model=$("modelInput").value.trim(),technician=$("techSelect").value;
+ if(!vehicle||!model||!technician)return alert("Enter Vehicle Number, Car Model and Technician.");
+  // Daily token reset: only today's tokens are used to calculate the next token.
+  const today=day();
+  const todayTokens=[
+    ...Object.values(queue).filter(v=>(v.tokenDate||day(v.createdAt))===today),
+    ...Object.values(done).filter(v=>(v.tokenDate||day(v.createdAt||v.completedAt))===today)
+  ].map(v=>Number(v.token)||0);
+  const max=Math.max(0,...todayTokens);
+  const item={token:max+1,tokenDate:today,vehicle,model,technician,status:"waiting",createdAt:Date.now()};
+ try{await set(push(ref(db,Q)),item);$("vehicleInput").value="";$("modelInput").value="";$("techSelect").value=""}catch(e){alert("Cannot save vehicle: "+e.message)}
+};
+window.startService=async id=>{
+ const current=Object.values(queue).find(v=>v.status==="serving");
+ if(current)return alert("Only one vehicle can be serving because there is one bay.");
+ try{await update(ref(db,Q+"/"+id),{status:"serving",startedAt:Date.now()})}catch(e){alert(e.message)}
+};
+window.completeVehicle=async id=>{
+ const v=queue[id];if(!v)return;
+ try{await set(ref(db,D+"/"+id),{...v,status:"completed",completedAt:Date.now()});await remove(ref(db,Q+"/"+id))}catch(e){alert("Complete failed: "+e.message)}
+};
+window.changeTech=async(id,name)=>{try{await update(ref(db,Q+"/"+id),{technician:name})}catch(e){alert(e.message)}};
+window.removeVehicle=async id=>{if(confirm("Remove this vehicle?"))try{await remove(ref(db,Q+"/"+id))}catch(e){alert(e.message)}};
+
+function card(id,v){
+ const serving=v.status==="serving";
+ return `<div class="vehicle"><div class="row"><div><div class="token">TOKEN #${v.token}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div><div class="techline">👨‍🔧 <select onchange="changeTech('${id}',this.value)">${techs.map(t=>`<option value="${esc(t)}" ${t===v.technician?"selected":""}>${esc(t)}</option>`).join("")}</select></div></div><span class="status ${serving?"busy":"available"}">${serving?"SERVING":"WAITING"}</span></div><div class="actions">${serving?`<button class="green" onclick="completeVehicle('${id}')">COMPLETE</button>`:`<button class="orange" onclick="startService('${id}')">START SERVICE</button>`}<button class="red" onclick="removeVehicle('${id}')">REMOVE</button></div></div>`;
+}
+function renderQueue(){
+ const arr=Object.entries(queue).sort((a,b)=>a[1].token-b[1].token);
+ const serving=arr.filter(([,v])=>v.status==="serving").slice(0,1);
+ const sid=serving[0]?.[0]; const waiting=arr.filter(([id])=>id!==sid);
+ $("servingList").innerHTML=serving.length?card(...serving[0]):'<div class="empty">No vehicle currently serving.</div>';
+ $("waitingList").innerHTML=waiting.length?waiting.map(x=>card(...x)).join(""):'<div class="empty">No waiting vehicles.</div>';
+ $("activeCount").textContent=arr.length;$("servingCount").textContent=serving.length;$("waitingCount").textContent=waiting.length;$("doneCount").textContent=Object.keys(done).length;
+ renderTV(serving,waiting);renderReports();renderTech();
+}
+function renderTV(serving,waiting){
+ const v=serving[0]?.[1];
+ $("tvServing").innerHTML=v?`<div class="tv-token">TOKEN #${v.token}</div><div class="tv-vehicle">${esc(v.vehicle)}</div><div class="tv-model">${esc(v.model)}</div><div class="tv-tech">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div>`:'<div class="empty" style="color:white">WAITING FOR NEXT VEHICLE</div>';
+ $("tvWaiting").innerHTML=waiting.length?waiting.map(([,x])=>`<div class="waitrow"><b>TOKEN #${x.token}</b><div><div class="waitvehicle">${esc(x.vehicle)}</div><div>${esc(x.model)}</div></div><div class="tv-tech">👨‍🔧 ${esc(x.technician||"Not Assigned")}</div></div>`).join(""):'<div class="empty" style="color:white">NO WAITING VEHICLES</div>';
+}
+$("addTechBtn").onclick=async()=>{const n=$("newTech").value.trim();if(!n)return;if(techs.some(x=>x.toLowerCase()===n.toLowerCase()))return alert("Already exists.");await set(ref(db,T+"/"+encodeURIComponent(n)),{name:n});$("newTech").value=""};
+window.checkIn=async n=>{const k=day();if(attendance[k]?.[n]?.checkIn)return;await update(ref(db,A+"/"+k+"/"+encodeURIComponent(n)),{checkIn:Date.now(),checkOut:null})};
+window.checkOut=async n=>{const k=day(),r=attendance[k]?.[n];if(!r?.checkIn)return alert("Check in first.");await update(ref(db,A+"/"+k+"/"+encodeURIComponent(n)),{checkOut:Date.now()})};
+window.deleteTech=async n=>{if(Object.values(queue).some(v=>v.technician===n))return alert("Change assigned vehicles first.");if(confirm("Remove "+n+"?"))await remove(ref(db,T+"/"+encodeURIComponent(n)))};
+function renderTech(){
+ const today=attendance[day()]||{};
+ const busy=new Set(Object.values(queue).filter(v=>v.status==="serving").map(v=>v.technician));
+ $("techGrid").innerHTML=techs.map(n=>{const r=today[n]||{},assigned=Object.values(queue).filter(v=>v.technician===n).length;const st=r.checkOut?"CHECKED OUT":r.checkIn?"PRESENT":"NOT CHECKED IN";return `<div class="tech-card"><div class="row"><b>${esc(n)}</b><span class="status ${busy.has(n)?"busy":"available"}">${busy.has(n)?"BUSY":"AVAILABLE"}</span></div><div class="att">Attendance: <b>${st}</b><br>Check In: <b>${time(r.checkIn)}</b><br>Check Out: <b>${time(r.checkOut)}</b><br>Assigned Vehicles: <b>${assigned}</b></div>${!r.checkIn?`<button class="green" onclick="checkIn('${esc(n)}')">CHECK IN</button>`:!r.checkOut?`<button class="orange" onclick="checkOut('${esc(n)}')">CHECK OUT</button>`:`<button disabled>CHECKED OUT</button>`}<div class="actions"><button class="red" onclick="deleteTech('${esc(n)}')">REMOVE TECHNICIAN</button></div></div>`}).join("")||'<div class="empty">No technicians.</div>'}
+function renderCompletedRecords(){
+ const box=$("completedRecords"); if(!box)return;
+ const q=(($("recordSearch")?.value)||"").trim().toLowerCase();
+ const filterDate=($("recordDate")?.value)||"";
+ const rows=Object.values(done).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0)).filter(v=>{
+   const hay=[v.vehicle,v.model,v.technician,v.token].join(" ").toLowerCase();
+   return (!q||hay.includes(q)) && (!filterDate||day(v.completedAt||v.createdAt)===filterDate);
+ });
+ box.innerHTML=rows.length?rows.map(v=>{
+   const start=v.startedAt?time(v.startedAt):"—";
+   const end=v.completedAt?time(v.completedAt):"—";
+   let duration="—";
+   if(v.startedAt&&v.completedAt){
+     const mins=Math.max(0,Math.round((v.completedAt-v.startedAt)/60000));
+     duration=`${Math.floor(mins/60)}h ${mins%60}m`;
+   }
+   return `<div class="vehicle">
+     <div class="row">
+       <div><div class="token">TOKEN #${esc(v.token)}</div><div class="vehicle-number">${esc(v.vehicle)}</div><div class="model">${esc(v.model)}</div><div class="techline">👨‍🔧 ${esc(v.technician||"Not Assigned")}</div></div>
+       <span class="status available">COMPLETED</span>
+     </div>
+     <div class="att">🕐 Start: <b>${start}</b> &nbsp; | &nbsp; ✅ Completed: <b>${end}</b> &nbsp; | &nbsp; ⏱️ Duration: <b>${duration}</b><br>📅 Date: <b>${esc(day(v.completedAt||v.createdAt))}</b></div>
+   </div>`;
+ }).join(""):'<div class="empty">No completed vehicle records found.</div>';
+}
+$("recordSearch").addEventListener("input",renderCompletedRecords);
+$("recordDate").addEventListener("change",renderCompletedRecords);
+$("clearRecordFilter").onclick=()=>{$("recordSearch").value="";$("recordDate").value="";renderCompletedRecords()};
+
+function renderReports(){
+ const today=day(),month=today.slice(0,7);
+ $("reportGrid").innerHTML=techs.map(n=>{let worked=0,todayDone=0,monthDone=0,total=0;Object.values(queue).forEach(v=>{if(v.technician===n&&day(v.createdAt)===today)worked++});Object.values(done).forEach(v=>{if(v.technician!==n)return;total++;const d=day(v.completedAt||v.createdAt);if(d===today){todayDone++;worked++}if(d.startsWith(month))monthDone++});return `<div class="report-card"><h3>${esc(n)}</h3><p>🚗 Vehicles Worked Today: <b>${worked}</b></p><p>✅ Done Today: <b>${todayDone}</b></p><p>📅 Done This Month: <b>${monthDone}</b></p><p>🏆 Total Done: <b>${total}</b></p></div>`}).join("")||'<div class="empty">No technicians.</div>';renderCompletedRecords();
+}
+
+onValue(ref(db,T),async snap=>{const data=snap.val()||{};if(!Object.keys(data).length){for(const n of defaults)await set(ref(db,T+"/"+encodeURIComponent(n)),{name:n});return}techs=Object.values(data).map(x=>x.name).filter(Boolean).sort();renderSelect();renderQueue()});
+onValue(ref(db,Q),snap=>{queue=snap.val()||{};renderQueue()},e=>alert("Firebase Queue Error: "+e.message));
+onValue(ref(db,D),snap=>{done=snap.val()||{};renderQueue()});
+onValue(ref(db,A),snap=>{attendance=snap.val()||{};renderTech();renderReports()});
+</script>
+</body></html>
