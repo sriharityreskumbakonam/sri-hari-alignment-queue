@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sri Hari Tyres – Smart Workshop</title>
+<style>
+:root{--bg:#07111f;--card:#101d2e;--card2:#15253a;--line:#29405b;--text:#f4f7fb;--muted:#9db0c7;--accent:#38bdf8;--green:#22c55e;--orange:#f59e0b;--red:#ef4444}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#07111f,#0b1626);color:var(--text)}
+header{padding:18px 22px;background:#081321;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.brand{font-size:24px;font-weight:800}.brand span{color:var(--accent)}.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;background:#0b1726;border-bottom:1px solid var(--line)}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}.tab.active{background:var(--accent);color:#062033;border-color:var(--accent)}
+.page{display:none;padding:20px;max-width:1500px;margin:auto}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.card{background:rgba(16,29,46,.96);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px #0002}
+h2,h3{margin-top:0}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.form-grid.staff{grid-template-columns:repeat(2,minmax(180px,1fr))}
+input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);font-size:15px}input,select{background:#091522;color:var(--text)}button{border:0;background:var(--accent);color:#042033;font-weight:800;cursor:pointer}button.green{background:var(--green);color:#05200d}button.orange{background:var(--orange);color:#281800}button.red{background:var(--red);color:white}button.dark{background:#253b54;color:white}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{width:auto;padding:9px 12px}
+.queue{display:grid;gap:10px}.job{display:grid;grid-template-columns:100px 1.3fr 1.2fr 1.3fr 1.2fr auto;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--line);padding:12px;border-radius:12px}.token{font-size:22px;font-weight:900;color:var(--accent)}
+.badge{display:inline-block;padding:5px 9px;border-radius:99px;font-size:12px;font-weight:800}.waiting{background:#3b2a08;color:#fbbf24}.service{background:#063d26;color:#86efac}.completed{background:#123152;color:#7dd3fc}
+.metric{font-size:34px;font-weight:900;color:var(--accent)}.label{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
+.tv{min-height:75vh}.now{border:2px solid var(--accent);background:linear-gradient(135deg,#0e2940,#102035);text-align:center}.now .big{font-size:clamp(48px,8vw,110px);font-weight:900;color:var(--accent)}.waiting-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.waiting-card{background:#14243a;border:1px solid var(--line);padding:16px;border-radius:14px}.empty{color:var(--muted);padding:15px;text-align:center}
+.small{font-size:12px;color:var(--muted)}.staffrow{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr auto;gap:8px;align-items:center;background:var(--card2);padding:10px;border-radius:10px;margin:7px 0}
+@media(max-width:800px){.form-grid{grid-template-columns:1fr}.job,.staffrow{grid-template-columns:1fr}.page{padding:12px}.tabs{padding:10px}.brand{font-size:20px}}
+@media print{header,.tabs,.no-print{display:none}.page{display:block!important}.page:not(#reports){display:none!important}body{background:white;color:black}.card{box-shadow:none}}
+ 
+/* TV DISPLAY */
+.tv{max-width:none;width:100%;padding:12px;min-height:calc(100vh - 100px)}
+.tv-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;margin-bottom:10px;font-size:clamp(18px,2vw,32px)}
+.tv-header span{font-size:.5em;color:var(--muted);margin-left:12px}.tv-count{color:var(--muted);font-size:.55em}.tv-count strong{color:var(--accent);font-size:1.7em}
+.tv-now{padding:14px 20px;margin-bottom:12px;min-height:48vh;display:flex;flex-direction:column;justify-content:center}
+.tv-title{font-size:clamp(20px,2vw,34px);font-weight:900;letter-spacing:2px;color:var(--accent);margin-bottom:8px}
+.tv-now .big{font-size:clamp(34px,4vw,62px)!important;line-height:1;margin:0 0 6px}
+.tv-vehicle{font-size:clamp(52px,8vw,125px);font-weight:950;letter-spacing:2px;line-height:1.05;word-break:break-word}
+.tv-model{font-size:clamp(34px,4.5vw,70px);font-weight:850;line-height:1.15;margin-top:8px}
+.tv-details{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:clamp(17px,1.8vw,30px);color:#d9e8f6}
+.tv-wait{padding:12px}.tv-wait-title{font-size:clamp(20px,2vw,30px);font-weight:900;margin-bottom:10px}
+.tv .waiting-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:9px}
+.tv .waiting-card{padding:10px 14px;min-height:120px}.tv .waiting-card .token{font-size:clamp(16px,1.5vw,24px);color:var(--muted)}
+.tv .waiting-card .wait-vehicle{font-size:clamp(22px,2.3vw,38px);font-weight:900;margin:4px 0}
+.tv .waiting-card .wait-model{font-size:clamp(18px,1.8vw,28px);font-weight:800;color:var(--accent)}
+.tv .waiting-card p{margin:4px 0;font-size:clamp(13px,1.2vw,18px)}
+@media (min-width:1200px){.tv .waiting-grid{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:700px){.tv-header{font-size:18px}.tv-header span{display:none}.tv-now{min-height:auto}.tv-details{gap:8px}.tv .waiting-grid{grid-template-columns:1fr}}
+
+.incentive-note{color:var(--muted);font-size:12px;margin-top:8px}
+</style>
+
+<style id="frontLoginOnly">
+html,body{min-height:100%;margin:0}
+#loginGateFixed{
+ position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;
+ padding:24px;box-sizing:border-box;overflow:auto;
+ background:
+ radial-gradient(circle at 8% 82%,rgba(37,99,235,.18),transparent 24%),
+ radial-gradient(circle at 92% 50%,rgba(59,130,246,.14),transparent 22%),
+ linear-gradient(135deg,#020817 0%,#07152c 48%,#020817 100%);
+}
+#loginGateFixed:before{
+ content:"";position:absolute;left:-150px;bottom:-150px;width:420px;height:420px;border-radius:50%;
+ border:48px solid rgba(148,163,184,.12);box-shadow:0 0 0 25px rgba(148,163,184,.05),0 0 0 70px rgba(148,163,184,.025);
+}
+#loginGateFixed:after{
+ content:"";position:absolute;right:-140px;top:18%;width:430px;height:180px;border-radius:55% 20% 40% 35%;
+ border:2px solid rgba(148,163,184,.16);transform:skewX(-18deg);
+}
+body.login-required > *:not(#loginGateFixed){visibility:hidden!important;pointer-events:none!important}
+body.login-ok > #loginGateFixed{display:none!important}
+
+.login-card-fixed{
+ position:relative;z-index:2;width:min(650px,100%);background:rgba(255,255,255,.985);
+ border-radius:28px;padding:38px 54px 30px;box-sizing:border-box;text-align:center;
+ box-shadow:0 28px 90px rgba(0,0,0,.45);
+}
+.login-logo-row{display:flex;align-items:center;justify-content:center;gap:15px}
+.login-wheel{width:58px;height:58px;border:8px solid #0f172a;border-radius:50%;box-sizing:border-box;position:relative}
+.login-wheel:before,.login-wheel:after{content:"";position:absolute;inset:9px;border-radius:50%;border:3px solid #64748b}
+.login-wheel:after{inset:23px;background:#f97316;border:0}
+.login-title-fixed{font-size:44px;font-weight:900;letter-spacing:1px;line-height:1;color:#0f172a}
+.login-title-fixed span{color:#f97316}
+.login-sub-fixed{display:flex;align-items:center;justify-content:center;gap:16px;font-size:20px;font-weight:700;letter-spacing:1.2px;color:#334155;margin:20px 0 28px}
+.login-sub-fixed:before,.login-sub-fixed:after{content:"";width:70px;height:2px;background:#f97316}
+.login-sub-fixed:after{background:#1d4ed8}
+.field-fixed{position:relative;margin:13px 0;text-align:left}
+.field-fixed label{display:block;font-size:12px;font-weight:800;color:#64748b;margin:0 0 6px 2px;text-transform:uppercase;letter-spacing:.7px}
+.field-fixed input{
+ width:100%;box-sizing:border-box;padding:17px 18px 17px 48px;border:1px solid #cbd5e1;border-radius:14px;
+ font-size:18px;color:#0f172a;background:#fff;outline:none;
+}
+.field-fixed input:focus{border-color:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.10)}
+.field-icon{position:absolute;left:17px;bottom:17px;font-size:20px;opacity:.7}
+.login-card-fixed button{
+ width:100%;padding:17px;border:0;border-radius:14px;font-size:18px;font-weight:900;margin-top:12px;cursor:pointer;
+ background:linear-gradient(90deg,#1d4ed8,#2563eb);color:#fff;letter-spacing:.4px;
+ box-shadow:0 10px 24px rgba(37,99,235,.25)
+}
+.login-card-fixed button:hover{filter:brightness(1.05)}
+.login-error-fixed{min-height:22px;color:#b91c1c;font-weight:700;margin-top:10px}
+.login-help-fixed{margin-top:13px;padding:13px;border:1px solid #93c5fd;border-radius:13px;color:#1d4ed8;font-weight:800;font-size:15px}
+.login-footer-fixed{font-size:12px;color:#64748b;margin-top:22px}
+@media(max-width:600px){
+ .login-card-fixed{padding:30px 24px 24px;border-radius:22px}
+ .login-title-fixed{font-size:34px}
+ .login-sub-fixed{font-size:16px;gap:9px}
+ .login-sub-fixed:before,.login-sub-fixed:after{width:38px}
+}
+</style>
+
+<style id="singleLogoutStyle">
+#singleLogoutBtn{
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:1000;
+  padding:5px 9px;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:6px;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  line-height:1.2;
+}
+#singleLogoutBtn:hover{background:rgba(255,255,255,.22)}
+body.login-required #singleLogoutBtn{display:none!important}
+@media(max-width:650px){
+  #singleLogoutBtn{top:8px;right:8px;font-size:10px;padding:4px 7px}
+}
+</style>
+
+<script type="module" id="firebaseSecureAuth">
+import {initializeApp,getApps} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getDatabase,ref,get} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const firebaseConfig={apiKey:"AIzaSyAhvfSgluNVW53mIXDiwKr8TXgsYdok-VA",authDomain:"sriharismartservice.firebaseapp.com",databaseURL:"https://sriharismartservice-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"sriharismartservice",storageBucket:"sriharismartservice.firebasestorage.app",messagingSenderId:"1055234466491",appId:"1:1055234466491:web:2306ef58239ebe8aa2ff9e"};
+const app=getApps().length?getApps()[0]:initializeApp(firebaseConfig);
+const auth=getAuth(app), db=getDatabase(app);
+window.sriHariSecureAuth={
+ login:(email,password)=>signInWithEmailAndPassword(auth,email,password),
+ logout:()=>signOut(auth),
+ reset:(email)=>sendPasswordResetEmail(auth,email),
+ watch:(cb)=>onAuthStateChanged(auth,cb),
+ profile:async(uid)=>{const x=await get(ref(db,"users/"+uid));return x.exists()?x.val():{};}
+};
+window.dispatchEvent(new Event("sriHariAuthReady"));
+</script>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#07111f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sri Hari Tyres">
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));}
+</script>
+</head>
+<body class="login-required">
+<div id="loginGateFixed">
+  <div class="login-card-fixed">
+    <div class="login-logo-row">
+      <div class="login-wheel"></div>
+      <div class="login-title-fixed">SRI HARI <span>TYRES</span></div>
+    </div>
+    <div class="login-sub-fixed">SMART QUEUE LOGIN</div>
+
+    <div class="field-fixed">
+      <label for="frontUserFixed">Email</label>
+      <span class="field-icon">✉</span>
+      <input id="frontUserFixed" placeholder="Enter your email" autocomplete="username">
+    </div>
+
+    <div class="field-fixed">
+      <label for="frontPassFixed">Password</label>
+      <span class="field-icon">🔒</span>
+      <input id="frontPassFixed" type="password" placeholder="Enter password" autocomplete="current-password">
+    </div>
+
+    <button type="button" id="frontLoginButtonFixed">⇥ &nbsp; LOGIN</button>
+    <div id="frontLoginErrorFixed" class="login-error-fixed"></div>
+    <button type="button" id="forgotPasswordBtn" class="login-help-fixed" style="background:#eff6ff;border:1px solid #93c5fd;width:100%;cursor:pointer">🔒 FORGOT PASSWORD?</button>
+    <div class="login-footer-fixed">© 2026 Sri Hari Tyres – Queue &amp; Service Management System</div>
+  </div>
+</div>
+
+<header><div class="brand">SRI HARI <span>TYRES</span></div><div class="sub">SMART WORKSHOP & TOKEN MANAGEMENT SYSTEM</div></header>
+<nav class="tabs">
+<button class="tab active" data-page="dashboard">🏠 Dashboard</button>
+<button class="tab" data-page="tokens">➕ Token & Staff Control</button>
+<button class="tab" data-page="staffs">👥 Staffs & Attendance</button>
+<button class="tab" data-page="tv">📺 TV Display</button>
+<button class="tab" data-page="reports">📊 Reports</button><button class="tab" data-page="incentive">💰 Incentive</button><button class="tab" data-page="backup">💾 Backup</button>
+</nav>
+
+<section id="dashboard" class="page active"><h2>Today's Dashboard</h2><div id="metrics" class="grid"></div><div class="card"><h3>Today's Service Summary</h3><div id="serviceSummary"></div></div></section>
+
+<section id="tokens" class="page">
+<div class="card"><h2>➕ Add Vehicle & Generate Token</h2>
+<div class="form-grid"><input id="vehicle" placeholder="Vehicle Number"><input id="model" placeholder="Car Model">
+<select id="serviceType"></select><select id="tech"></select></div>
+<div style="margin-top:12px"><button onclick="generateToken()">GENERATE TOKEN</button></div></div>
+<div class="card" style="margin-top:16px"><h2>🔧 Now Servicing</h2><div id="inService" class="queue"></div></div>
+<div class="card" style="margin-top:16px"><h2>⏳ Waiting Vehicles</h2><div id="waiting" class="queue"></div></div>
+</section>
+
+<section id="staffs" class="page">
+<div class="card"><h2>👥 Staff Management</h2>
+<div class="form-grid staff">
+<input id="staffName" placeholder="Staff Name">
+<select id="staffRole"><option>Car Technician</option><option>Two-Wheeler Technician</option><option>Manager</option></select>
+</div>
+<div class="actions" style="margin-top:12px"><button onclick="addStaff()">➕ ADD STAFF</button></div>
+</div>
+
+<div class="card" style="margin-top:16px"><h2>⏰ Today's Attendance</h2><div id="staffList"></div></div>
+
+<div class="card" style="margin-top:16px"><h2>📅 Monthly Staff Summary</h2>
+<div class="form-grid">
+<input id="staffSummaryMonth" type="month" onchange="renderStaffV2()">
+<select id="staffSummaryPerson" onchange="renderStaffV2"><option value="">All Staff</option></select>
+</div>
+<div id="staffSummary" style="margin-top:12px"></div>
+</div>
+</section>
+
+<section id="tv" class="page tv">
+<div class="tv-header"><div><b>SRI HARI TYRES</b><span>LIVE SERVICE QUEUE</span></div><div class="tv-count">WAITING: <strong id="waitingCount">0</strong></div></div>
+<div class="card now tv-now"><div class="tv-title">NOW SERVICING</div><div id="tvNow"></div></div>
+<div class="card tv-wait"><div class="tv-wait-title">⏳ WAITING VEHICLES</div><div id="tvWaiting" class="waiting-grid"></div></div>
+</section>
+
+<section id="reports" class="page">
+<div class="card" style="margin-bottom:16px">
+<h2>⏱️ Service Start / End / Duration</h2>
+<div id="serviceTimeReportV12"></div>
+</div>
+
+<div class="card" style="margin-top:16px"><h2>⏱️ Service Time Performance</h2>
+<div id="serviceTimeReportV11"></div></div>
+
+<div class="grid" id="reportMetrics"></div>
+<div class="card" style="margin-top:16px"><h2>👨‍🔧 Technician Work Done Today</h2><div id="todayTech"></div></div>
+
+<div class="card" style="margin-top:16px"><h2>📅 Technician Work Done This Month</h2><div id="monthTech"></div></div>
+<div class="card" style="margin-top:16px">
+<h2>🔍 Search & Filter History</h2>
+<div class="form-grid">
+<input id="historySearch" placeholder="Search Vehicle Number or Car Model" oninput="renderReports()">
+<input id="fromDate" type="date" onchange="renderReports()">
+<input id="toDate" type="date" onchange="renderReports()">
+<select id="historyTech" onchange="renderReports()"><option value="">All Technicians</option></select>
+<select id="historyService" onchange="renderReports()"><option value="">All Service Types</option></select>
+</div>
+<div class="actions" style="margin-top:12px"><button class="dark" onclick="clearHistoryFilters()">CLEAR FILTERS</button></div>
+<div id="historyResultCount" class="small" style="margin-top:12px"></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>📋 Completed Service History</h2><div style="overflow:auto"><table><thead><tr><th>Date</th><th>Token</th><th>Vehicle</th><th>Model</th><th>Service</th><th>Technician</th><th>Completed</th></tr></thead><tbody id="history"></tbody></table></div></div>
+</section>
+
+
+<section id="incentive" class="page">
+<div id="token8IncentiveRule" class="card" style="margin-bottom:16px;border-left:4px solid var(--accent)">
+<h3>🎯 Daily Incentive Rule</h3>
+<div class="small" style="font-size:14px;line-height:1.7">
+<strong>Tokens 1–7:</strong> No incentive.<br>
+<strong>Token 8 onwards:</strong> Incentive calculation starts.<br>
+Only completed eligible tokens are included in the service incentive pool.
+</div>
+</div>
+<div class="card" style="margin-bottom:16px">
+<h2>💰 Incentive Calculation</h2>
+<div id="simpleIncentiveSummary"></div>
+</div>
+
+<div class="card"><h2>📅 Select Incentive Date</h2>
+<div class="form-grid">
+<label>Today's Incentive Date<input id="incentiveDate" type="date" onchange="renderIncentivePage()"></label>
+<label>Monthly Summary<input id="incentiveMonth" type="month" onchange="renderIncentivePage()"></label>
+</div>
+</div>
+
+<div class="card" style="margin-top:16px"><h2>🛵 Two-Wheeler Fitting Entry</h2>
+<div class="form-grid">
+<label>🛵 Two-Wheeler Fittings on Selected Date
+<input id="dailyFittingInput" type="number" min="0" step="1" value="0" oninput="updateTwoWheelerFittingV12(this.value)"></label>
+</div>
+<div class="small" style="margin-top:8px">Each two-wheeler fitting = ₹10, independent of token count. Alignment + 2W incentives form ONE daily pool, shared equally among ALL present Car Technicians and Two-Wheeler Technicians.</div>
+<div id="dailyIncentiveTable" style="margin-top:14px"></div>
+
+</div>
+
+
+<div class="card" style="margin-top:16px"><h2>🔒 Finalize Incentive</h2>
+<div class="form-grid">
+<input id="managerPin" type="password" inputmode="numeric" placeholder="Manager PIN">
+
+</div>
+<button id="finalizeIncentiveBtn" type="button" onclick="finalizeIncentiveV12()" style="margin-top:10px">🔒 FINALIZE & LOCK THIS DATE</button>
+<button type="button" onclick="unlockIncentiveV12()" style="margin-top:10px">🔓 UNLOCK THIS DATE</button>
+<div id="lockStatus" class="small" style="margin-top:8px"></div>
+<div style="margin-top:16px"><h3>📅 Finalized Incentive History</h3><div id="finalizedIncentiveHistory"></div></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>📆 Monthly Technician Incentive</h2>
+<div id="monthlyIncentiveTable"></div>
+</div>
+</section>
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAhvfSgluNVW53mIXDiwKr8TXgsYdok-VA",
+  authDomain: "sriharismartservice.firebaseapp.com",
+  databaseURL: "https://sriharismartservice-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sriharismartservice",
+  storageBucket: "sriharismartservice.firebasestorage.app",
+  messagingSenderId: "1055234466491",
+  appId: "1:1055234466491:web:2306ef58239ebe8aa2ff9e"
+};
+
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const db = getDatabase(app);
+// All live queue/incentive devices use the same Sri Hari Smart Service Firebase project.
+const ROOT = "sriHariTyresTokenV1";
+const STATE_REF = ref(db, ROOT + "/state");
+
+window.__firebaseReady = true;
+window.__db = db;
+window.__stateRef = STATE_REF;
+window.__fbSet = set;
+window.__fbOnValue = onValue;
+window.__fbRunTransaction = runTransaction;
+
+onValue(STATE_REF, (snap) => {
+  const data = snap.val();
+  if (data && data.jobs && data.staff && data.attendance) {
+    window.__remoteState = data;
+    if (window.applyRemoteState) window.applyRemoteState(data);
+  } else if (window.initializeFirebaseState) {
+    window.initializeFirebaseState();
+  }
+});
+</script>
+
+<script>
+const SERVICES=['ALIGNMENT','ALIGNMENT + WHEEL BALANCING','2 TYRE CHANGE + ALIGNMENT + BALANCING','4 TYRE CHANGE + ALIGNMENT + WHEEL BALANCING'];
+const DEFAULT_STAFF=[['Aravind','Car Technician'],['Arjun','Car Technician'],['Arivazhagan','Car Technician'],['Sarath','Car Technician'],['Vijay','Car Technician']];
+const KEY='sriHariTyresV1';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{jobs:[],staff:DEFAULT_STAFF.map(([name,role])=>({id:crypto.randomUUID(),name,role,active:true})),attendance:[]};
+state.fittingCounts=state.fittingCounts||{};
+state.incentiveLocks=state.incentiveLocks||{};
+state.incentiveFinalized=state.incentiveFinalized||{};
+
+async function initializeFirebaseState(){
+  if(!window.__firebaseReady) return;
+  try{
+    const snap=await get(window.__stateRef);
+    if(snap.exists()){
+      applyRemoteState(snap.val());
+    }else{
+      lastSyncedState=cloneState(state);
+      await window.__fbSet(window.__stateRef, state);
+    }
+  }catch(err){ console.error('Firebase initialization failed:',err); }
+}
+let lastSyncedState = null;
+let saveTimer = null;
+
+function cloneState(x){
+  return x ? JSON.parse(JSON.stringify(x)) : null;
+}
+
+function applyRemoteState(remote){
+  lastSyncedState = cloneState(remote);
+  state = cloneState(remote);
+  localStorage.setItem(KEY,JSON.stringify(state));
+  render();
+}
+
+function mergeArrayById(base, local, remote){
+  const b=Array.isArray(base)?base:[];
+  const l=Array.isArray(local)?local:[];
+  const r=Array.isArray(remote)?remote:[];
+  const bm=new Map(b.map(x=>[String(x.id),x]));
+  const lm=new Map(l.map(x=>[String(x.id),x]));
+  const rm=new Map(r.map(x=>[String(x.id),x]));
+  const ids=new Set([...bm.keys(),...lm.keys(),...rm.keys()]);
+  const out=[];
+  ids.forEach(id=>{
+    const bv=bm.get(id), lv=lm.get(id), rv=rm.get(id);
+    const localChanged=JSON.stringify(lv??null)!==JSON.stringify(bv??null);
+    const remoteChanged=JSON.stringify(rv??null)!==JSON.stringify(bv??null);
+    if(localChanged && lv!==undefined) out.push(cloneState(lv));
+    else if(localChanged && lv===undefined) {
+      // Local deletion wins only if remote has not independently changed the same record.
+      if(!remoteChanged) return;
+      out.push(cloneState(rv));
+    } else if(rv!==undefined) out.push(cloneState(rv));
+  });
+  return out;
+}
+
+function mergeMap(base, local, remote){
+  const b=base||{}, l=local||{}, r=remote||{};
+  const out=cloneState(r)||{};
+  const keys=new Set([...Object.keys(b),...Object.keys(l),...Object.keys(r)]);
+  keys.forEach(k=>{
+    const localChanged=JSON.stringify(l[k]??null)!==JSON.stringify(b[k]??null);
+    const remoteChanged=JSON.stringify(r[k]??null)!==JSON.stringify(b[k]??null);
+    if(localChanged) {
+      if(l[k]===undefined) {
+        if(!remoteChanged) delete out[k];
+      } else {
+        out[k]=cloneState(l[k]);
+      }
+    }
+  });
+  return out;
+}
+
+function mergeStates(base, local, remote){
+  const out=cloneState(remote)||{};
+  const arrayKeys=['jobs','staff','attendance','history','serviceLogs','completedJobs'];
+  const mapKeys=['fittingCounts','incentiveLocks','incentiveFinalized','tokenCounters','reports','dailyReports','monthlyReports','checkins','checkOuts','workSessions','sampleData'];
+  arrayKeys.forEach(k=>out[k]=mergeArrayById(base?.[k],local?.[k],remote?.[k]));
+  mapKeys.forEach(k=>out[k]=mergeMap(base?.[k],local?.[k],remote?.[k]));
+  const keys=new Set([...Object.keys(base||{}),...Object.keys(local||{}),...Object.keys(remote||{})]);
+  keys.forEach(k=>{
+    if(arrayKeys.includes(k)||mapKeys.includes(k)) return;
+    const localChanged=JSON.stringify(local?.[k]??null)!==JSON.stringify(base?.[k]??null);
+    const remoteChanged=JSON.stringify(remote?.[k]??null)!==JSON.stringify(base?.[k]??null);
+    if(localChanged) {
+      if(local?.[k]===undefined) {
+        if(!remoteChanged) delete out[k];
+      } else {
+        out[k]=cloneState(local[k]);
+      }
+    }
+  });
+  return out;
+}
+
+async function syncState(){
+  if(!window.__firebaseReady) return;
+  const baseline=cloneState(lastSyncedState)||cloneState(state);
+  try{
+    const snap=await get(window.__stateRef);
+    const remote=snap.exists()?snap.val():{};
+    const merged=mergeStates(baseline,state,remote);
+    await window.__fbSet(window.__stateRef,merged);
+    lastSyncedState=cloneState(merged);
+    state=cloneState(merged);
+    localStorage.setItem(KEY,JSON.stringify(state));
+    render();
+  }catch(err){
+    console.error('Firebase sync failed:',err);
+    // Keep local state; next save/retry can synchronize it.
+  }
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(state));
+  render();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(syncState,80);
+}
+window.addEventListener('online',()=>{const e=document.getElementById('firebaseLiveStatus');if(e)e.textContent='🟢 Online • Firebase live sync';});
+window.addEventListener('offline',()=>{const e=document.getElementById('firebaseLiveStatus');if(e)e.textContent='🔴 Offline • changes will sync when connection returns';});
+setTimeout(()=>{const e=document.getElementById('firebaseLiveStatus');if(e)e.textContent=navigator.onLine?'🟢 Online • Firebase live sync':'🔴 Offline';},1200);
+
+function today(){return new Date().toLocaleDateString('en-CA')}
+function month(){return today().slice(0,7)}
+function esc(x){return String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function time(){return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+function fillSelects(){
+ document.getElementById('serviceType').innerHTML=SERVICES.map(x=>`<option>${x}</option>`).join('');
+ const techs=state.staff.filter(s=>s.active&&s.role==='Car Technician');
+ document.getElementById('tech').innerHTML=techs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+}
+async function generateToken(){
+ const vehicle=document.getElementById('vehicle').value.trim().toUpperCase(),
+       model=document.getElementById('model').value.trim(),
+       service=document.getElementById('serviceType').value,
+       technicianId=document.getElementById('tech').value;
+ if(!vehicle||!model||!technicianId)return alert('Please enter Vehicle Number, Car Model and Technician.');
+ if(!window.__firebaseReady)return alert('Firebase is not connected. Please check your internet connection.');
+
+ const date=today();
+ const counterRef=ref(window.__db,"sriHariTyresTokenV1/tokenCounters/"+date);
+
+ try{
+   const tx=await window.__fbRunTransaction(counterRef,current=>{
+     const n=Number(current||0);
+     return n+1;
+   });
+   if(!tx.committed) throw new Error('Token counter was not committed.');
+   const token=Number(tx.snapshot.val());
+
+   // Re-read the latest shared state before adding the job.
+   const snap=await get(window.__stateRef);
+   const remote=snap.exists()?snap.val():state;
+   const job={
+     id:crypto.randomUUID(),date,token,vehicle,model,service,technicianId,
+     status:'waiting',createdAt:Date.now(),startedAt:null,completedAt:null
+   };
+
+   lastSyncedState=cloneState(remote);
+   state=cloneState(remote);
+   state.jobs=Array.isArray(state.jobs)?state.jobs:[];
+   state.jobs.push(job);
+   await syncState();
+
+   document.getElementById('vehicle').value='';
+   document.getElementById('model').value='';
+   alert('Token #'+token+' generated successfully.');
+ }catch(err){
+   console.error(err);
+   alert('Token generation failed. Please try again.');
+ }
+}
+function techName(id){return state.staff.find(s=>s.id===id)?.name||'Unassigned'}
+function updateJob(id,patch){Object.assign(state.jobs.find(j=>j.id===id),patch);save()}
+function removeJob(id){if(confirm('Remove this token?')){state.jobs=state.jobs.filter(j=>j.id!==id);save()}}
+function jobCard(j){
+ const techOptions=state.staff.filter(s=>s.active&&s.role==='Car Technician').map(s=>`<option value="${s.id}" ${s.id===j.technicianId?'selected':''}>${esc(s.name)}</option>`).join('');
+ const serviceOptions=SERVICES.map(x=>`<option ${x===j.service?'selected':''}>${x}</option>`).join('');
+ const buttons=j.status==='waiting'?`<button class="green" onclick="updateJob('${j.id}',{status:'service',startedAt:Date.now()})">▶ START</button>`:`<button class="green" onclick="updateJob('${j.id}',{status:'completed',completedAt:Date.now()})">✓ COMPLETE</button>`;
+ return `<div class="job"><div><div class="token">#${j.token}</div><span class="badge ${j.status==='waiting'?'waiting':'service'}">${j.status==='waiting'?'WAITING':'IN SERVICE'}</span></div>
+ <div><b>🚗 ${esc(j.vehicle)}</b><div class="small">Vehicle Number</div></div><div><b>🚙 ${esc(j.model)}</b><div class="small">Car Model</div></div>
+ <select onchange="updateJob('${j.id}',{service:this.value})">${serviceOptions}</select><select onchange="updateJob('${j.id}',{technicianId:this.value})">${techOptions}</select>
+ <div class="actions">${buttons}<button class="red" onclick="removeJob('${j.id}')">REMOVE</button></div></div>`
+}
+function renderJobs(){
+ const active=state.jobs.filter(j=>j.date===today()&&j.status!=='completed').sort((a,b)=>a.token-b.token);
+ const servicing=active.filter(j=>j.status==='service'),waiting=active.filter(j=>j.status==='waiting');
+ document.getElementById('inService').innerHTML=servicing.length?servicing.map(jobCard).join(''):'<div class="empty">No vehicle currently in service.</div>';
+ document.getElementById('waiting').innerHTML=waiting.length?waiting.map(jobCard).join(''):'<div class="empty">No vehicles waiting.</div>';
+}
+function attendanceFor(staffId){return state.attendance.find(a=>a.staffId===staffId&&a.date===today())}
+function checkIn(id){if(!attendanceFor(id)){state.attendance.push({id:crypto.randomUUID(),staffId:id,date:today(),inAt:Date.now(),outAt:null});save()}}
+function checkOut(id){let a=attendanceFor(id);if(a&&!a.outAt){a.outAt=Date.now();save()}}
+function fmt(ts){return ts?new Date(ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'—'}
+
+function addStaff(){
+ const n=document.getElementById('staffName').value.trim(), r=document.getElementById('staffRole').value;
+ if(!n)return alert('Enter staff name');
+ state.staff.push({id:crypto.randomUUID(),name:n,role:r,active:true});
+ document.getElementById('staffName').value=''; save();
+}
+function editStaff(id){
+ const st=state.staff.find(x=>x.id===id); if(!st)return;
+ const n=prompt('Staff name',st.name); if(n===null)return;
+ const roles=['Car Technician','Two-Wheeler Technician','Manager'];
+ const role=prompt('Role: Car Technician / Two-Wheeler Technician / Manager',st.role);
+ if(n.trim())st.name=n.trim(); if(roles.includes(role))st.role=role;
+ save();
+}
+function toggleStaff(id){
+ const st=state.staff.find(x=>x.id===id); if(!st)return;
+ st.active=!st.active; save();
+}
+function removeStaff(id){
+ const st=state.staff.find(x=>x.id===id); if(!st)return;
+ if(!confirm('Archive/remove '+st.name+'? Old attendance, work and incentive history will be kept.'))return;
+ st.active=false; save();
+}
+function attendanceFor(staffId){return state.attendance.find(a=>a.staffId===staffId&&a.date===today())}
+function checkIn(id){if(!attendanceFor(id)){state.attendance.push({id:crypto.randomUUID(),staffId:id,date:today(),inAt:Date.now(),outAt:null});save()}}
+function checkOut(id){let a=attendanceFor(id);if(a&&!a.outAt){a.outAt=Date.now();save()}}
+function fmt(ts){return ts?new Date(ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'—'}
+
+function renderStaff(){
+ const active=state.staff.filter(s=>s.active);
+ document.getElementById('staffList').innerHTML=active.map(s=>{
+   let a=attendanceFor(s.id);
+   return `<div class="staffrow">
+   <b>${esc(s.name)}</b><span>${esc(s.role)}</span>
+   <span>IN: ${fmt(a?.inAt)}</span><span>OUT: ${fmt(a?.outAt)}</span>
+   <span>${!a?'Not Checked In':a.outAt?'Checked Out':'Working'}</span>
+   <div class="actions">
+   ${!a?`<button class="green" onclick="checkIn('${s.id}')">CHECK IN</button>`:!a.outAt?`<button class="orange" onclick="checkOut('${s.id}')">CHECK OUT</button>`:''}
+   <button class="dark" onclick="editStaff('${s.id}')">EDIT</button>
+   <button class="red" onclick="removeStaff('${s.id}')">REMOVE</button>
+   </div></div>`;
+ }).join('')||'<div class="empty">No active staff.</div>';
+
+ renderStaffV2();
+}
+function staffMonth(){
+ return document.getElementById('staffSummaryMonth')?.value || today().slice(0,7);
+}
+function presentDates(staffId, ym){
+ return new Set(state.attendance.filter(a=>a.staffId===staffId&&a.date.startsWith(ym)&&a.inAt).map(a=>a.date));
+}
+function incentiveByDate(date, staffId){
+ const result=calculateIncentive(date);
+ const row=result.result.find(x=>x.staff.id===staffId);
+ return row?row.amount:0;
+}
+function renderStaffV2(){
+ const monthInput=document.getElementById('staffSummaryMonth');
+ if(!monthInput)return;
+ if(!monthInput.value)monthInput.value=today().slice(0,7);
+ const ym=monthInput.value;
+ const person=document.getElementById('staffSummaryPerson');
+ const selected=person.value;
+ person.innerHTML='<option value="">All Staff</option>'+state.staff.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ if([...person.options].some(o=>o.value===selected))person.value=selected;
+
+ const people=state.staff.filter(s=>!selected||s.id===selected);
+ const daysInMonth=new Date(Number(ym.slice(0,4)),Number(ym.slice(5,7)),0).getDate();
+ const lastDay=ym===today().slice(0,7)?Number(today().slice(8,10)):daysInMonth;
+
+ document.getElementById('staffSummary').innerHTML=`<div style="overflow:auto"><table>
+ <thead><tr><th>Staff</th><th>Role</th><th>Working Days</th><th>Absent Days</th><th>Today's Incentive</th><th>Total Incentive</th></tr></thead>
+ <tbody>${people.map(st=>{
+   const pd=presentDates(st.id,ym);
+   const working=pd.size;
+   let absent=0;
+   for(let d=1;d<=lastDay;d++){const ds=ym+'-'+String(d).padStart(2,'0'); if(!pd.has(ds))absent++;}
+   let total=0;
+   pd.forEach(ds=>{total+=incentiveByDate(ds,st.id)});
+   const todayInc=st.active&&ym===today().slice(0,7)?incentiveByDate(today(),st.id):0;
+   return `<tr><td><b>${esc(st.name)}</b></td><td>${esc(st.role)}</td><td>${working}</td><td>${absent}</td><td>₹${todayInc.toFixed(2)}</td><td>₹${total.toFixed(2)}</td></tr>`;
+ }).join('')}</tbody></table></div>
+ <p class="small">Working Day rule: any check-in on a date counts as 1 working day. Future dates are not counted as absent.</p>`;
+}
+
+function activeServiceJob(){
+ return state.jobs.find(j=>j.date===today()&&j.status==='service');
+}
+function startServiceV11(id){
+ const active=activeServiceJob();
+ if(active && active.id!==id){
+   alert(`BAY BUSY\nToken #${active.token} — ${active.vehicle}\nis currently being serviced.`);
+   return;
+ }
+ const j=state.jobs.find(x=>x.id===id); if(!j)return;
+ j.status='service'; j.startedAt=Date.now();
+ save();
+}
+function completeServiceV11(id){
+ const j=state.jobs.find(x=>x.id===id); if(!j)return;
+ j.status='completed'; j.completedAt=Date.now();
+ save();
+}
+function serviceElapsedV11(j){
+ if(!j.startedAt)return '00:00';
+ const ms=Math.max(0,(j.completedAt||Date.now())-j.startedAt);
+ const sec=Math.floor(ms/1000),m=Math.floor(sec/60),ss=sec%60;
+ return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+}
+function serviceDurationMinutesV11(j){
+ return j.startedAt&&j.completedAt?Math.round((j.completedAt-j.startedAt)/60000):0;
+}
+function renderBayTimerV11(){
+ const j=activeServiceJob();
+ document.querySelectorAll('[data-service-timer]').forEach(el=>el.textContent=j?serviceElapsedV11(j):'00:00');
+}
+setInterval(renderBayTimerV11,1000);
+function renderTV(){
+ const active=state.jobs.filter(j=>j.date===today()&&j.status!=='completed'),now=active.filter(j=>j.status==='service').sort((a,b)=>a.startedAt-b.startedAt)[0],waiting=active.filter(j=>j.status==='waiting').sort((a,b)=>a.token-b.token);
+ document.getElementById('waitingCount').textContent=waiting.length;
+ document.getElementById('tvNow').innerHTML=now?`<div class="big">TOKEN #${now.token}</div><div class="tv-vehicle">${esc(now.vehicle)}</div><div class="tv-model">${esc(now.model)}</div><div class="tv-details"><span>🔧 ${esc(now.service)}</span><span>👨‍🔧 ${esc(techName(now.technicianId))}</span></div>`:'<div class="empty">No vehicle currently in service</div>';
+ document.getElementById('tvWaiting').innerHTML=waiting.length?waiting.map(j=>`<div class="waiting-card"><div class="token">TOKEN #${j.token}</div><div class="wait-vehicle">${esc(j.vehicle)}</div><div class="wait-model">${esc(j.model)}</div><p>🔧 ${esc(j.service)}</p><p>👨‍🔧 ${esc(techName(j.technicianId))}</p></div>`).join(''):'<div class="empty">No vehicles waiting</div>';
+}
+function renderDashboard(){
+ const jobs=state.jobs.filter(j=>j.date===today()),counts={total:jobs.length,waiting:jobs.filter(j=>j.status==='waiting').length,service:jobs.filter(j=>j.status==='service').length,completed:jobs.filter(j=>j.status==='completed').length};
+ document.getElementById('metrics').innerHTML=[['TOTAL TOKENS',counts.total],['WAITING',counts.waiting],['IN SERVICE',counts.service],['COMPLETED',counts.completed]].map(([l,v])=>`<div class="card"><div class="metric">${v}</div><div class="label">${l}</div></div>`).join('');
+ document.getElementById('serviceSummary').innerHTML=SERVICES.map(s=>{let n=jobs.filter(j=>j.service===s&&j.status==='completed').length;return `<p><b>${esc(s)}</b>: ${n}</p>`}).join('');
+}
+function techTable(filter){const techs=state.staff.filter(s=>s.role==='Car Technician'&&s.active);return `<table><thead><tr><th>Technician</th><th>Completed Jobs</th>${SERVICES.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>${techs.map(s=>{let js=state.jobs.filter(j=>filter(j)&&j.technicianId===s.id&&j.status==='completed');return `<tr><td><b>${esc(s.name)}</b></td><td>${js.length}</td>${SERVICES.map(x=>`<td>${js.filter(j=>j.service===x).length}</td>`).join('')}</tr>`}).join('')}</tbody></table>`}
+function fillHistoryFilters(){
+ const tech=document.getElementById('historyTech');
+ const selectedTech=tech.value;
+ tech.innerHTML='<option value="">All Technicians</option>'+state.staff.filter(s=>s.active&&s.role==='Car Technician').map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ if([...tech.options].some(o=>o.value===selectedTech)) tech.value=selectedTech;
+ const service=document.getElementById('historyService');
+ const selectedService=service.value;
+ service.innerHTML='<option value="">All Service Types</option>'+SERVICES.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ if([...service.options].some(o=>o.value===selectedService)) service.value=selectedService;
+}
+function clearHistoryFilters(){
+ document.getElementById('historySearch').value='';
+ document.getElementById('fromDate').value='';
+ document.getElementById('toDate').value='';
+ document.getElementById('historyTech').value='';
+ document.getElementById('historyService').value='';
+ renderReports();
+}
+
+function isPresentOnDate(staffId,date){
+  const a=state.attendance.find(x=>x.staffId===staffId&&x.date===date);
+  return !!(a&&a.inAt);
+}
+function incentiveForJob(j){
+  if(j.service==='ALIGNMENT') return 90;
+  return 150;
+}
+function twoWheelerFittingCount(j){
+  return j.service.startsWith('2 TYRE') ? 1 : 0;
+}
+function calculateIncentive(date){
+  // DAILY INCENTIVE THRESHOLD:
+  // Tokens 1–7 are NOT eligible.
+  // Token 8 onwards are eligible for incentive.
+  const allCompleted=state.jobs
+    .filter(j=>j.status==='completed'&&j.date===date)
+    .sort((a,b)=>Number(a.token||0)-Number(b.token||0));
+
+  const completed=allCompleted.filter(j=>Number(j.token||0)>=8);
+  const eligibleTokenCount=completed.length;
+  const lastCompletedToken=allCompleted.length
+    ? Math.max(...allCompleted.map(j=>Number(j.token||0)))
+    : 0;
+
+  const pool=completed.reduce((sum,j)=>sum+incentiveForJob(j),0);
+
+  const input=document.getElementById('twoWheelFittingInput');
+  const enteredTwoWheelFit=input ? Math.max(0,Number(input.value)||0) : 0;
+
+  // Two-wheeler fitting incentive is accepted only after the
+  // daily queue has reached token #8.
+  const twoWheelFit=lastCompletedToken>=8 ? enteredTwoWheelFit : 0;
+  const fittingPool=twoWheelFit*10;
+  const carTechs=state.staff.filter(s=>s.active&&s.role==='Car Technician'&&isPresentOnDate(s.id,date));
+  const twoTechs=state.staff.filter(s=>s.active&&s.role==='Two-Wheeler Technician'&&isPresentOnDate(s.id,date));
+  const totalPresent=carTechs.length+twoTechs.length;
+  const baseShare=totalPresent?pool/totalPresent:0;
+  const fittingShare=twoTechs.length?fittingPool/twoTechs.length:0;
+  const result=state.staff.filter(s=>s.active).map(s=>{
+    const present=isPresentOnDate(s.id,date);
+    let amount=0;
+    if(present) amount+=baseShare;
+    if(present&&s.role==='Two-Wheeler Technician') amount+=fittingShare;
+    return {staff:s,present,amount};
+  });
+  return {
+    completed,
+    allCompleted,
+    eligibleTokenCount,
+    lastCompletedToken,
+    pool,
+    fittingPool,
+    twoWheelFit,
+    enteredTwoWheelFit,
+    carTechs,
+    twoTechs,
+    totalPresent,
+    result
+  };
+}
+function renderTodayIncentive(){ }
+function renderIncentiveSummary(date, targetId){
+  const box=document.getElementById(targetId); if(!box)return;
+  const x=calculateIncentive(date);
+  box.innerHTML=`
+  <div class="grid">
+    <div class="card"><div class="metric">₹${x.pool.toFixed(2)}</div><div class="label">SERVICE INCENTIVE POOL</div></div>
+    <div class="card"><div class="metric">₹${x.fittingPool.toFixed(2)}</div><div class="label">2-WHEELER FITTING POOL</div></div>
+    <div class="card"><div class="metric">${x.totalPresent}</div><div class="label">PRESENT TECHNICIANS</div></div>
+  </div>
+  <p class="small"><strong>Incentive threshold:</strong> Tokens 1–7 are free from incentive; Token 8 onwards is eligible. Alignment = ₹90. All other listed services = ₹150. Two-wheeler fitting is entered separately above at ₹10 each. The service incentive pool is divided equally among present technicians. The two-wheeler fitting pool is divided equally among present Two-Wheeler Technicians. Absent technicians receive ₹0.</p>
+  <div style="overflow:auto"><table><thead><tr><th>Technician</th><th>Role</th><th>Attendance</th><th>Incentive</th></tr></thead><tbody>
+  ${x.result.map(r=>`<tr><td>${esc(r.staff.name)}</td><td>${esc(r.staff.role)}</td><td>${r.present?'Present':'Absent'}</td><td>₹${r.amount.toFixed(2)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+function renderReports(){
+ fillHistoryFilters();
+ const done=state.jobs.filter(j=>j.status==='completed'),td=done.filter(j=>j.date===today()),mo=done.filter(j=>j.date.startsWith(month()));
+ document.getElementById('reportMetrics').innerHTML=[['COMPLETED TODAY',td.length],['COMPLETED THIS MONTH',mo.length],['TOTAL RECORDS',done.length]].map(([l,v])=>`<div class="card"><div class="metric">${v}</div><div class="label">${l}</div></div>`).join('');
+ document.getElementById('todayTech').innerHTML=techTable(j=>j.date===today());
+
+ document.getElementById('monthTech').innerHTML=techTable(j=>j.date.startsWith(month()));
+ const q=(document.getElementById('historySearch')?.value||'').trim().toLowerCase();
+ const from=document.getElementById('fromDate')?.value||'';
+ const to=document.getElementById('toDate')?.value||'';
+ const techId=document.getElementById('historyTech')?.value||'';
+ const service=document.getElementById('historyService')?.value||'';
+ const filtered=done.filter(j=>{
+   const text=(j.vehicle+' '+j.model).toLowerCase();
+   return (!q||text.includes(q)) && (!from||j.date>=from) && (!to||j.date<=to) && (!techId||j.technicianId===techId) && (!service||j.service===service);
+ }).sort((a,b)=>b.completedAt-a.completedAt);
+ document.getElementById('historyResultCount').textContent=filtered.length+' completed record'+(filtered.length===1?'':'s')+' found';
+ document.getElementById('history').innerHTML=filtered.length?filtered.map(j=>`<tr><td>${j.date}</td><td>#${j.token}</td><td>${esc(j.vehicle)}</td><td>${esc(j.model)}</td><td>${esc(j.service)}</td><td>${esc(techName(j.technicianId))}</td><td>${new Date(j.completedAt).toLocaleString()}</td></tr>`).join(''):`<tr><td colspan="7" class="empty">No matching completed records found.</td></tr>`;
+}
+function render(){fillSelects();renderJobs();renderStaff();renderTV();renderDashboard();renderReports()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.page).classList.add('active');});
+window.addEventListener('storage',e=>{if(e.key===KEY&&!window.__firebaseReady){state=JSON.parse(e.newValue);render()}});
+if(window.__remoteState) applyRemoteState(window.__remoteState);
+
+function incentiveForDateWithFitting(date, fittingCount){
+ const completed=state.jobs.filter(j=>j.status==='completed'&&j.date===date);
+ const pool=completed.reduce((sum,j)=>sum+(j.service==='ALIGNMENT'?90:150),0);
+ const fitting=Math.max(0,Number(fittingCount)||0)*10;
+ const present=state.staff.filter(st=>st.active&&st.role!=='Manager'&&isPresentOnDate(st.id,date));
+ const totalPool=pool+fitting;
+ const equalShare=present.length?totalPool/present.length:0;
+ return {completed,pool,fitting,totalPool,rows:present.map(st=>({st,amount:equalShare}))};
+}
+function renderIncentivePageOld(){
+ const dateEl=document.getElementById('incentiveDate');
+ const monthEl=document.getElementById('incentiveMonth');
+ if(!dateEl||!monthEl)return;
+ if(!dateEl.value)dateEl.value=today();
+ if(!monthEl.value)monthEl.value=today().slice(0,7);
+ const date=dateEl.value; const fitEl=document.getElementById('dailyFittingInput'); if(fitEl && state.fittingCounts[date]!==undefined) fitEl.value=state.fittingCounts[date]; const fitting=fitEl?.value||0;
+ const d=incentiveForDateWithFitting(date,fitting);
+ document.getElementById('dailyIncentiveTable').innerHTML=`
+ <div class="grid">
+ <div class="card"><div class="metric">₹${d.pool.toFixed(2)}</div><div class="label">SERVICE POOL</div></div>
+ <div class="card"><div class="metric">₹${d.fitting.toFixed(2)}</div><div class="label">2-WHEEL FITTING POOL</div></div>
+ <div class="card"><div class="metric">₹${d.totalPool.toFixed(2)}</div><div class="label">TOTAL INCENTIVE POOL</div></div>
+ <div class="card"><div class="metric">${d.rows.length}</div><div class="label">PRESENT TECHNICIANS</div></div>
+ </div>
+ <table><thead><tr><th>Technician</th><th>Role</th><th>Today's Incentive</th></tr></thead><tbody>
+ ${d.rows.map(r=>`<tr><td>${esc(r.st.name)}</td><td>${esc(r.st.role)}</td><td><b>₹${r.amount.toFixed(2)}</b></td></tr>`).join('')||'<tr><td colspan="3">No present technicians.</td></tr>'}
+ </tbody></table>`;
+ const lock=document.getElementById('lockStatus'); if(lock){const dlock=!!state.incentiveLocks[date];lock.textContent=dlock?'🔒 This date is LOCKED.':'🔓 This date is OPEN.';}
+ const dh=document.getElementById('dailyHistory'); if(dh){const entries=Object.keys(state.fittingCounts||{}).sort().reverse().slice(0,31);dh.innerHTML=entries.length?'<table><thead><tr><th>Date</th><th>Fittings</th><th>Fitting Pool</th><th>Status</th></tr></thead><tbody>'+entries.map(d=>`<tr><td>${d}</td><td>${state.fittingCounts[d]}</td><td>₹${Number(state.fittingCounts[d])*10}</td><td>${state.incentiveLocks[d]?'Locked':'Open'}</td></tr>`).join('')+'</tbody></table>':'No daily incentive history yet.';}
+ const ym=monthEl.value;
+ const totals={};
+ const days=new Set(state.jobs.filter(j=>j.status==='completed'&&j.date.startsWith(ym)).map(j=>j.date));
+ Object.keys(state.fittingCounts||{}).filter(d=>d.startsWith(ym)).forEach(d=>days.add(d));
+ days.forEach(d=>{
+   const calc=incentiveForDateWithFitting(d,state.fittingCounts?.[d]||0);
+   calc.rows.forEach(r=>totals[r.st.id]=(totals[r.st.id]||0)+r.amount);
+ });
+ const fh=document.getElementById('fittingHistory');
+ if(fh){
+   const entries=Object.entries(state.fittingCounts||{}).filter(([d,n])=>n>0).sort((a,b)=>b[0].localeCompare(a[0]));
+   fh.innerHTML=entries.length?`<table><thead><tr><th>Date</th><th>Two-Wheeler Fittings</th><th>Fitting Incentive</th></tr></thead><tbody>${entries.map(([d,n])=>`<tr><td>${esc(d)}</td><td>${n}</td><td>₹${(Number(n)*10).toFixed(2)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No two-wheeler fitting entries yet.</div>';
+ }
+
+ document.getElementById('monthlyIncentiveTable').innerHTML=`
+ <table><thead><tr><th>Technician</th><th>Role</th><th>Monthly Incentive</th></tr></thead><tbody>
+ ${state.staff.filter(st=>st.active&&st.role!=='Manager').map(st=>`<tr><td>${esc(st.name)}</td><td>${esc(st.role)}</td><td><b>₹${(totals[st.id]||0).toFixed(2)}</b></td></tr>`).join('')}
+ </tbody></table>
+ <p class="small">Monthly total is accumulated from each day's calculated incentive pool. Service incentive + two-wheeler fitting incentive are combined and divided equally among all present technicians for that day.</p>`;
+}
+
+function managerOk(){
+ const pin=document.getElementById('managerPin')?.value||prompt('Enter Manager PIN');
+ if(pin==='1234')return true;
+ alert('Incorrect Manager PIN.'); return false;
+}
+function toggleIncentiveLock(){
+ if(!managerOk())return;
+ const d=document.getElementById('incentiveDate').value;
+ state.incentiveLocks[d]=!state.incentiveLocks[d]; save(); renderIncentivePage();
+}
+function exportBusinessBackup(){
+  try{
+    if(typeof XLSX==='undefined'){
+      alert('Excel backup library is not loaded. Please check your internet connection and try again.');
+      return;
+    }
+
+    const wb=XLSX.utils.book_new();
+    const s=state||{};
+
+    // 1. Staff
+    const staffRows=(s.staff||[]).map(st=>({
+      ID:st.id||'',
+      Name:st.name||'',
+      Role:st.role||'',
+      Active:st.active!==false?'Yes':'No'
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(staffRows.length?staffRows:[{ID:'',Name:'',Role:'',Active:''}]),
+      'Staff'
+    );
+
+    // 2. Jobs / token history
+    const jobRows=(s.jobs||[]).map(j=>({
+      Date:j.date||'',
+      Token:j.token||'',
+      Vehicle:j.vehicle||'',
+      Model:j.model||'',
+      Service:j.service||'',
+      Technician:techName(j.technicianId),
+      TechnicianID:j.technicianId||'',
+      Status:j.status||'',
+      CreatedAt:j.createdAt?new Date(j.createdAt).toLocaleString():'',
+      StartedAt:j.startedAt?new Date(j.startedAt).toLocaleString():'',
+      CompletedAt:j.completedAt?new Date(j.completedAt).toLocaleString():''
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(jobRows.length?jobRows:[{Date:'',Token:'',Vehicle:'',Model:'',Service:'',Technician:'',TechnicianID:'',Status:'',CreatedAt:'',StartedAt:'',CompletedAt:''}]),
+      'Jobs'
+    );
+
+    // 3. Attendance
+    const attendanceRows=(s.attendance||[]).map(a=>({
+      Date:a.date||'',
+      Staff:techName(a.staffId),
+      StaffID:a.staffId||'',
+      CheckIn:a.inAt?new Date(a.inAt).toLocaleString():'',
+      CheckOut:a.outAt?new Date(a.outAt).toLocaleString():''
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(attendanceRows.length?attendanceRows:[{Date:'',Staff:'',StaffID:'',CheckIn:'',CheckOut:''}]),
+      'Attendance'
+    );
+
+    // 4. Daily 2W fitting incentive entries
+    const fittingRows=Object.keys(s.fittingCounts||{}).sort().map(date=>({
+      Date:date,
+      TwoWheelerFittings:Number(s.fittingCounts[date]||0),
+      IncentiveAt10Rs:Number(s.fittingCounts[date]||0)*10
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(fittingRows.length?fittingRows:[{Date:'',TwoWheelerFittings:0,IncentiveAt10Rs:0}]),
+      '2W Fittings'
+    );
+
+    // 5. Finalized daily incentive
+    const incentiveRows=Object.values(s.incentiveFinalized||{}).sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(x=>({
+      Date:x.date||'',
+      AlignmentJobs:x.onlyAlignment||0,
+      ComboJobs:x.combo||0,
+      TwoWheelerFittings:x.twoWheelerFittings??x.twoWheelerTyres??0,
+      AlignmentIncentive:x.alignmentIncentive||0,
+      ComboIncentive:x.comboIncentive||0,
+      TwoWheelerIncentive:x.twoWheelerIncentive||0,
+      TotalIncentivePool:x.totalPool||0,
+      PresentTechnicians:x.presentCount||0,
+      PerHeadIncentive:x.perHead||0,
+      FinalizedAt:x.finalizedAt?new Date(x.finalizedAt).toLocaleString():''
+    }));
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.json_to_sheet(incentiveRows.length?incentiveRows:[{
+        Date:'',AlignmentJobs:0,ComboJobs:0,TwoWheelerFittings:0,
+        AlignmentIncentive:0,ComboIncentive:0,TwoWheelerIncentive:0,
+        TotalIncentivePool:0,PresentTechnicians:0,PerHeadIncentive:0,FinalizedAt:''
+      }]),
+      'Incentives'
+    );
+
+    // 6. Complete state as JSON text, so no backup information is lost.
+    const jsonRows=[{
+      BackupDate:new Date().toISOString(),
+      StateJSON:JSON.stringify(s)
+    }];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(jsonRows),'Full State');
+
+    // Make columns readable.
+    wb.SheetNames.forEach(name=>{
+      const ws=wb.Sheets[name];
+      const range=XLSX.utils.decode_range(ws['!ref']);
+      const widths=[];
+      for(let c=range.s.c;c<=range.e.c;c++){
+        let max=12;
+        for(let r=range.s.r;r<=Math.min(range.e.r,200);r++){
+          const cell=ws[XLSX.utils.encode_cell({r,c})];
+          const v=cell?String(cell.v||''):'';
+          max=Math.min(42,Math.max(max,v.length+2));
+        }
+        widths.push({wch:max});
+      }
+      ws['!cols']=widths;
+    });
+
+    XLSX.writeFile(wb,'sri-hari-tyres-backup-'+today()+'.xlsx');
+  }catch(err){
+    console.error(err);
+    alert('Excel backup failed: '+(err?.message||err));
+  }
+}
+function restoreBusinessBackup(){
+ if(!managerOk())return;
+ const f=document.getElementById('restoreFile'); f.click();
+ f.onchange=()=>{const file=f.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.state)throw Error();state=x.state;state.fittingCounts=state.fittingCounts||{};state.incentiveLocks=state.incentiveLocks||{};
+state.incentiveFinalized=state.incentiveFinalized||{};save();alert('Backup restored successfully.')}catch(e){alert('Invalid backup file.')}};r.readAsText(file);}
+}
+function cleanStartV11(){
+ if(!managerOk())return;
+ if(!confirm('This will remove test jobs, attendance, customers and appointments. Staff will remain. Continue?'))return;
+ state.jobs=[];state.attendance=[];state.customers=[];state.appointments=[];state.fittingCounts={};state.incentiveLocks={};state.incentiveFinalized={};save();alert('Clean start completed.');
+}
+function lookupVehicleV11(){
+ const q=(document.getElementById('vehicleLookup').value||'').trim().toUpperCase();
+ if(!q)return;
+ const rows=state.jobs.filter(j=>(j.vehicle||'').toUpperCase()===q).sort((a,b)=>(b.completedAt||b.createdAt||0)-(a.completedAt||a.createdAt||0));
+ document.getElementById('vehicleLookupResult').innerHTML=rows.length?`<b>${rows.length} visit(s)</b>`+rows.map(j=>`<div class="card" style="margin:6px 0">${j.date} • #${j.token} • ${esc(j.model)} • ${esc(j.service)} • ${esc(techName(j.technicianId))}</div>`).join(''):'No history found.';
+}
+
+
+function renderOneBayPremiumV11(){
+ const j=activeServiceJob();
+ const v=document.getElementById('bayVehicle'),m=document.getElementById('bayModel'),sv=document.getElementById('bayService'),t=document.getElementById('bayTech'),tm=document.getElementById('bayTimer');
+ if(!v)return;
+ if(!j){v.textContent='BAY AVAILABLE';m.textContent='';sv.textContent='';t.textContent='';tm.textContent='00:00';return;}
+ v.textContent=j.vehicle||'—';m.textContent=j.model||'—';sv.textContent=j.service||'—';t.textContent='👨‍🔧 '+techName(j.technicianId);tm.textContent=serviceElapsedV11(j);
+}
+setInterval(renderOneBayPremiumV11,1000);
+
+
+function renderServiceTimeReportV11(){
+ const el=document.getElementById('serviceTimeReportV11'); if(!el)return;
+ const done=state.jobs.filter(j=>j.status==='completed'&&j.date===today()&&j.startedAt&&j.completedAt);
+ const avg=done.length?Math.round(done.reduce((a,j)=>a+serviceDurationMinutesV11(j),0)/done.length):0;
+ const techs={}; done.forEach(j=>{techs[j.technicianId]=techs[j.technicianId]||[];techs[j.technicianId].push(serviceDurationMinutesV11(j));});
+ el.innerHTML=`<div class="grid"><div class="card"><div class="metric">${done.length}</div><div class="label">TIMED COMPLETED JOBS</div></div><div class="card"><div class="metric">${avg} min</div><div class="label">AVERAGE SERVICE TIME</div></div></div>
+ <table style="margin-top:12px"><thead><tr><th>Vehicle</th><th>Technician</th><th>Start</th><th>End</th><th>Duration</th></tr></thead><tbody>
+ ${done.map(j=>`<tr><td>${esc(j.vehicle)}</td><td>${esc(techName(j.technicianId))}</td><td>${fmt(j.startedAt)}</td><td>${fmt(j.completedAt)}</td><td>${serviceDurationMinutesV11(j)} min</td></tr>`).join('')||'<tr><td colspan="5">No completed timed jobs today.</td></tr>'}
+ </tbody></table>`;
+}
+
+function nextWaitingV12(){
+ return state.jobs.filter(j=>j.date===today()&&j.status==='waiting').sort((a,b)=>a.token-b.token)[0];
+}
+function renderNextVehicleV12(){
+ const j=nextWaitingV12();
+ const v=document.getElementById('nextVehicleV12'),m=document.getElementById('nextModelV12'),sv=document.getElementById('nextServiceV12');
+ if(!v)return;
+ if(!j){v.textContent='NO VEHICLES WAITING';m.textContent='';sv.textContent='';return;}
+ v.textContent=`TOKEN #${j.token} • ${j.vehicle||'—'}`;m.textContent=j.model||'—';sv.textContent=j.service||'—';
+}
+function callNextVehicleV12(){
+ const active=activeServiceJob();
+ if(active){alert(`BAY BUSY\n${active.vehicle} is currently being serviced.`);return;}
+ const j=nextWaitingV12();
+ if(!j){alert('No waiting vehicle.');return;}
+ startServiceV11(j.id);
+}
+
+function renderSimpleIncentiveSummary(){
+ const el=document.getElementById('simpleIncentiveSummary'); if(!el)return;
+ const d=selectedIncentiveDateV12();
+ const x=(state.incentiveFinalized||{})[d]||incentiveSnapshotV12(d);
+ const finalized=!!(state.incentiveFinalized||{})[d];
+ el.innerHTML=`<div style="font-size:18px;line-height:1.8">
+ ${finalized?'🔒 <b>FINALIZED & LOCKED</b>':'🟢 <b>OPEN — NOT FINALIZED</b>'}<br>
+ 📅 <b>Date:</b> ${esc(d)}<br>
+ 🔧 <b>Alignment jobs:</b> ${x.alignment} × ₹90 = ₹${x.alignment*90}<br>
+ 🚗 <b>Other completed jobs:</b> ${x.other} × ₹150 = ₹${x.other*150}<br>
+ 🛵 <b>Two-wheeler fittings:</b> ${x.fittings} × ₹10 = ₹${Number(x.fittingPool).toFixed(2)}<hr>
+ 💰 <b>Total Incentive Pool: ₹${Number(x.totalPool).toFixed(2)}</b><br>
+ 👨‍🔧 <b>Present Technicians:</b> ${x.presentCount}<br>
+ 🏆 <b>Each Technician Gets: ₹${Number(x.share).toFixed(2)}</b>
+ </div>`;
+}
+function selectedIncentiveDateV12(){
+ return document.getElementById('incentiveDate')?.value||today();
+}
+function incentiveSnapshotV12(date){
+ const jobs=(state.jobs||[]).filter(j=>j.date===date&&j.status==='completed');
+ const alignment=jobs.filter(j=>String(j.service||'').toUpperCase()==='ALIGNMENT').length;
+ const other=jobs.length-alignment;
+ const servicePool=alignment*90+other*150;
+ const fittings=Number((state.fittingCounts||{})[date]||0);
+ const fittingPool=fittings*10;
+ const totalPool=servicePool+fittingPool;
+ const present=(state.staff||[]).filter(st=>st.active!==false&&st.role!=='Manager'&&isPresentOnDate(st.id,date));
+ const share=present.length?totalPool/present.length:0;
+ return {date,alignment,other,servicePool,fittings,fittingPool,totalPool,presentCount:present.length,share,
+   technicians:present.map(st=>({id:st.id,name:st.name,role:st.role,amount:share}))};
+}
+function finalizeIncentiveV12(){
+ if(!managerOk())return;
+ const date=selectedIncentiveDateV12();
+ const snap=incentiveSnapshotV12(date);
+ if(!snap.presentCount){alert('No technicians are marked present for this date.');return;}
+ state.incentiveFinalized[date]={...snap,finalizedAt:Date.now()};
+ state.incentiveLocks[date]=true;
+ save(); renderIncentivePage(); renderIncentivePage();
+renderIncentivePage(); renderIncentivePage();
+ alert('Incentive finalized and locked for '+date+'.');
+}
+function unlockIncentiveV12(){
+ if(!managerOk())return;
+ const date=selectedIncentiveDateV12();
+ if(!state.incentiveFinalized[date]){alert('This date is not finalized yet.');return;}
+ if(!confirm('Unlock '+date+'? You can edit the data and finalize again.'))return;
+ delete state.incentiveFinalized[date]; state.incentiveLocks[date]=false;
+ save(); renderIncentivePage(); renderIncentivePage(); renderIncentivePage();
+}
+function renderFinalizedIncentiveHistoryV12(){
+ const el=document.getElementById('finalizedIncentiveHistory'); if(!el)return;
+ const rows=Object.values(state.incentiveFinalized||{}).sort((a,b)=>b.date.localeCompare(a.date));
+ el.innerHTML=rows.length?`<table><thead><tr><th>Date</th><th>Total Pool</th><th>Present</th><th>Each Gets</th><th>Status</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>₹${Number(x.totalPool).toFixed(2)}</td><td>${x.presentCount}</td><td>₹${Number(x.share).toFixed(2)}</td><td>🔒 Finalized</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No finalized incentive days yet.</div>';
+}
+
+/* ===== INCENTIVE V1.2 – BASED ON Alignment IncentiveMAY26.xlsm =====
+Excel logic:
+Tokens 1–7 = ₹0 incentive; Token 8 onwards is eligible.
+Only eligible Alignment × ₹90 + Combo/Other Service × ₹150 + Two-Wheeler Fittings × ₹10
+= Total Incentive Pool
+Total Pool ÷ Present Technicians = Per Head Incentive
+Monthly Incentive = sum of each day's Per Head Incentive for days the technician was present.
+*/
+function selectedIncentiveDateV12(){ return document.getElementById('incentiveDate')?.value || today(); }
+
+function isLockedIncentiveV12(date){
+ return !!(state.incentiveFinalized||{})[date];
+}
+
+function updateTwoWheelerFittingV12(value){
+ const date=selectedIncentiveDateV12();
+ if(isLockedIncentiveV12(date)){
+   alert('This date is FINALIZED & LOCKED. Click UNLOCK THIS DATE and enter the Manager PIN before editing.');
+   renderIncentivePage(); return;
+ }
+ state.fittingCounts=state.fittingCounts||{};
+ state.fittingCounts[date]=Math.max(0,parseInt(value,10)||0);
+ save();
+ renderIncentivePage();
+}
+
+function calculateExcelIncentiveV12(date){
+  const finalized=(state.incentiveFinalized||{})[date];
+  if(finalized) return {...finalized, locked:true};
+
+  // FINAL DAILY INCENTIVE RULE:
+  // Tokens 1–7 = no four-wheeler incentive.
+  // Token 8 onwards = eligible four-wheeler incentive.
+  // Every two-wheeler fitting = ₹10, independent of token count.
+  // BOTH pools are combined and divided equally among ALL present
+  // Car Technicians + Two-Wheeler Technicians.
+
+  const allCompleted=(state.jobs||[])
+    .filter(j=>j.date===date && j.status==='completed')
+    .sort((a,b)=>Number(a.token||0)-Number(b.token||0));
+
+  const eligibleCompleted=allCompleted.filter(j=>Number(j.token||0)>=8);
+
+  const onlyAlignment=eligibleCompleted.filter(
+    j=>String(j.service||'').trim().toUpperCase()==='ALIGNMENT'
+  ).length;
+
+  const combo=eligibleCompleted.length-onlyAlignment;
+
+  const twoWheelerFittings=Number((state.fittingCounts||{})[date]||0);
+
+  const alignmentIncentive=onlyAlignment*90;
+  const comboIncentive=combo*150;
+  const twoWheelerIncentive=twoWheelerFittings*10;
+
+  // ONE combined daily incentive pool.
+  const totalPool=alignmentIncentive+comboIncentive+twoWheelerIncentive;
+
+  // ALL present non-manager technicians share the complete pool equally.
+  const present=(state.staff||[]).filter(
+    st=>st.active!==false &&
+    st.role!=='Manager' &&
+    isPresentOnDate(st.id,date)
+  );
+
+  const perHead=present.length ? totalPool/present.length : 0;
+
+  return {
+    date,
+    onlyAlignment,
+    combo,
+    twoWheelerFittings,
+    twoWheelerTyres:twoWheelerFittings,
+    eligibleTokenCount:eligibleCompleted.length,
+    alignmentIncentive,
+    comboIncentive,
+    twoWheelerIncentive,
+    totalPool,
+    presentCount:present.length,
+    perHead,
+    technicians:present.map(st=>({
+      id:st.id,
+      name:st.name,
+      role:st.role,
+      amount:perHead
+    })),
+    locked:false
+  };
+}
+function finalizeIncentiveV12(){
+ if(!managerOk())return;
+ const date=selectedIncentiveDateV12();
+ const x=calculateExcelIncentiveV12(date);
+ if(x.presentCount===0){alert('No technician is marked PRESENT for this date.');return;}
+ state.incentiveFinalized=state.incentiveFinalized||{};
+ state.incentiveFinalized[date]={...x,locked:true,finalizedAt:Date.now()};
+ state.incentiveLocks=state.incentiveLocks||{};
+ state.incentiveLocks[date]=true;
+ save(); renderIncentivePage();
+ alert('Incentive finalized and locked for '+date+'.');
+}
+
+function unlockIncentiveV12(){
+ if(!managerOk())return;
+ const date=selectedIncentiveDateV12();
+ if(!(state.incentiveFinalized||{})[date]){alert('This date is already OPEN.');return;}
+ if(!confirm('Unlock '+date+'? After unlocking, fitting and attendance changes will recalculate the incentive.'))return;
+ delete state.incentiveFinalized[date];
+ state.incentiveLocks=state.incentiveLocks||{};
+ state.incentiveLocks[date]=false;
+ save(); renderIncentivePage();
+}
+
+function renderIncentivePage(){
+ const dateEl=document.getElementById('incentiveDate');
+ const monthEl=document.getElementById('incentiveMonth');
+ if(!dateEl||!monthEl)return;
+ if(!dateEl.value)dateEl.value=today();
+ if(!monthEl.value)monthEl.value=today().slice(0,7);
+ const date=dateEl.value, month=monthEl.value;
+ const x=calculateExcelIncentiveV12(date);
+ const fit=document.getElementById('dailyFittingInput');
+ if(fit){fit.value=x.twoWheelerTyres||0; fit.disabled=!!x.locked;}
+
+ const summary=document.getElementById('simpleIncentiveSummary');
+ if(summary)summary.innerHTML=`
+ <div style="font-size:18px;line-height:1.9">
+ ${x.locked?'🔒 <b>FINALIZED & LOCKED</b>':'🟢 <b>OPEN — CHANGES RECALCULATE AUTOMATICALLY</b>'}<br>
+ 📅 <b>Date:</b> ${esc(date)}
+ </div>`;
+
+ document.getElementById('dailyIncentiveTable').innerHTML=`
+ <div style="overflow:auto">
+ <table>
+ <thead><tr><th>Incentive Item</th><th>Quantity</th><th>Rate</th><th>Amount</th></tr></thead>
+ <tbody>
+ <tr><td>Only Wheel Alignment</td><td>${x.onlyAlignment}</td><td>₹90</td><td><b>₹${x.alignmentIncentive.toFixed(2)}</b></td></tr>
+ <tr><td>Alignment + Balancing / 2 Tyre Change / 4 Tyre Change</td><td>${x.combo}</td><td>₹150</td><td><b>₹${x.comboIncentive.toFixed(2)}</b></td></tr>
+ <tr><td>Two-Wheeler Fitting</td><td>${x.twoWheelerTyres}</td><td>₹10</td><td><b>₹${x.twoWheelerIncentive.toFixed(2)}</b></td></tr>
+ <tr><th colspan="3">TOTAL INCENTIVE POOL</th><th>₹${x.totalPool.toFixed(2)}</th></tr>
+ <tr><th colspan="3">PRESENT TECHNICIANS</th><th>${x.presentCount}</th></tr>
+ <tr><th colspan="3">PER HEAD INCENTIVE</th><th>₹${x.perHead.toFixed(2)}</th></tr>
+ </tbody></table>
+ </div>
+ <div style="margin-top:14px;overflow:auto">
+ <table><thead><tr><th>Technician</th><th>Role</th><th>Today's Incentive</th></tr></thead>
+ <tbody>${x.technicians.length?x.technicians.map(t=>`<tr><td>${esc(t.name)}</td><td>${esc(t.role)}</td><td><b>₹${Number(t.amount).toFixed(2)}</b></td></tr>`).join(''):'<tr><td colspan="3">No present technicians for this date.</td></tr>'}</tbody></table>
+ </div>`;
+
+ const lock=document.getElementById('lockStatus');
+ if(lock)lock.innerHTML=x.locked
+   ?`🔒 <b>FINALIZED:</b> ${date}. Amounts are frozen. To change fittings or attendance, click <b>UNLOCK THIS DATE</b>.`
+   :`🟢 <b>OPEN:</b> Any change to completed services, attendance or two-wheeler fitting will update the calculation automatically.`;
+
+ // Monthly summary exactly follows the Excel model: present days + accumulated daily per-head incentive.
+ const days=new Set();
+ (state.jobs||[]).filter(j=>j.date?.startsWith(month) && j.status==='completed').forEach(j=>days.add(j.date));
+ Object.keys(state.fittingCounts||{}).filter(d=>d.startsWith(month)).forEach(d=>days.add(d));
+ (state.attendance||[]).filter(a=>String(a.date||'').startsWith(month)).forEach(a=>days.add(a.date));
+ Object.keys(state.incentiveFinalized||{}).filter(d=>d.startsWith(month)).forEach(d=>days.add(d));
+
+ const staffRows=(state.staff||[]).filter(st=>st.active!==false&&st.role!=='Manager').map(st=>{
+   let presentDays=0,total=0;
+   [...days].sort().forEach(d=>{
+     const calc=calculateExcelIncentiveV12(d);
+     const wasPresent=calc.technicians.some(t=>t.id===st.id);
+     if(wasPresent){presentDays++; total+=Number(calc.perHead||0);}
+   });
+   return `<tr><td><b>${esc(st.name)}</b></td><td>${presentDays}</td><td><b>₹${total.toFixed(2)}</b></td></tr>`;
+ }).join('');
+
+ document.getElementById('monthlyIncentiveTable').innerHTML=`
+ <div class="small" style="margin-bottom:8px">Month: <b>${esc(month)}</b>. This follows your Excel: total present days and accumulated per-head incentive.</div>
+ <div style="overflow:auto"><table><thead><tr><th>Technician</th><th>Total Present Days</th><th>Total Incentive</th></tr></thead>
+ <tbody>${staffRows||'<tr><td colspan="3">No technician data.</td></tr>'}</tbody></table></div>`;
+
+ const hist=document.getElementById('finalizedIncentiveHistory');
+ if(hist){
+   const rows=Object.values(state.incentiveFinalized||{}).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+   hist.innerHTML=rows.length?`<table><thead><tr><th>Date</th><th>Total Pool</th><th>Present</th><th>Per Head</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.date)}</td><td>₹${Number(r.totalPool).toFixed(2)}</td><td>${r.presentCount}</td><td>₹${Number(r.perHead).toFixed(2)}</td><td>🔒 Finalized</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No finalized days yet.</div>';
+ }
+}
+
+/* ===== V1.2 PRODUCTION FIX: SERVICE TIME + CLEAN START ===== */
+function formatServiceDateTimeV12(ts){
+ if(!ts) return '—';
+ return new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function serviceDurationTextV12(j){
+ if(!j || !j.startedAt) return '—';
+ const ms=(j.completedAt||Date.now())-j.startedAt;
+ const total=Math.max(0,Math.floor(ms/1000));
+ const h=Math.floor(total/3600), m=Math.floor((total%3600)/60), sec=total%60;
+ if(h) return `${h}h ${m}m ${sec}s`;
+ return `${m}m ${sec}s`;
+}
+function startServiceV11(id){
+ const active=(state.jobs||[]).find(j=>j.date===today()&&j.status==='service'&&j.id!==id);
+ if(active){alert(`BAY BUSY\n${active.vehicle||'Vehicle'} is currently being serviced.`);return;}
+ const j=(state.jobs||[]).find(x=>x.id===id); if(!j)return;
+ j.status='service';
+ if(!j.startedAt) j.startedAt=Date.now();
+ j.completedAt=null;
+ save(); render();
+}
+function completeServiceV11(id){
+ const j=(state.jobs||[]).find(x=>x.id===id); if(!j)return;
+ if(!j.startedAt){j.startedAt=Date.now();}
+ j.status='completed'; j.completedAt=Date.now();
+ save(); render();
+}
+function cleanStartProductionV12(){
+ if(!managerOk())return;
+ const msg='This will permanently remove ALL sample/test and operational data:\n\n• Tokens & queue\n• Vehicle history\n• Completed service records\n• Attendance/check-in/check-out\n• Incentive fitting entries\n• Finalized incentive history\n\nStaff names and settings will be kept.\n\nContinue?';
+ if(!confirm(msg))return;
+ if(!confirm('FINAL CONFIRMATION: Start with completely clean data and Token #1?'))return;
+ // Keep only people/settings; wipe every data collection that can pollute reports.
+ state.jobs=[];
+ state.attendance=[];
+ state.fittingCounts={};
+ state.incentiveLocks={};
+ state.incentiveFinalized={};
+ state.tokenCounters={};
+ state.history=[];
+ state.serviceLogs=[];
+ state.completedJobs=[];
+ state.activeJob=null;
+ // Generic cleanup for known optional collections without deleting staff/settings.
+ ['reports','dailyReports','monthlyReports','checkins','checkOuts','workSessions','sampleData'].forEach(k=>{
+   if(k in state) state[k]=Array.isArray(state[k])?[]:{};
+ });
+ save();
+ render();
+ alert('Production Clean Start completed.\n\nAll test data is removed.\nThe next token will start from 1.');
+}
+function injectServiceTimeColumnsV12(){
+ // Append service timing information to any history/report rows that contain a completed job.
+ document.querySelectorAll('[data-job-id]').forEach(el=>{
+   const j=(state.jobs||[]).find(x=>String(x.id)===String(el.dataset.jobId));
+   if(!j||!j.startedAt)return;
+   if(!el.querySelector('.service-time-v12')){
+     const d=document.createElement('div');
+     d.className='service-time-v12';
+     d.style.marginTop='6px';
+     d.innerHTML=`🟢 Start: <b>${formatServiceDateTimeV12(j.startedAt)}</b><br>🔴 End: <b>${formatServiceDateTimeV12(j.completedAt)}</b><br>⏱️ Total: <b>${serviceDurationTextV12(j)}</b>`;
+     el.appendChild(d);
+   }
+ });
+}
+setInterval(injectServiceTimeColumnsV12,1000);
+
+function renderServiceTimeReportV12(){
+ const el=document.getElementById('serviceTimeReportV12'); if(!el)return;
+ const jobs=(state.jobs||[]).filter(j=>j.startedAt).sort((a,b)=>(b.completedAt||b.startedAt)-(a.completedAt||a.startedAt));
+ el.innerHTML=`<div style="overflow:auto"><table><thead><tr><th>Date</th><th>Vehicle</th><th>Model</th><th>Service</th><th>Technician</th><th>Start Time</th><th>End Time</th><th>Total Time</th></tr></thead><tbody>${
+ jobs.map(j=>`<tr><td>${esc(j.date||'—')}</td><td><b>${esc(j.vehicle||'—')}</b></td><td>${esc(j.model||'—')}</td><td>${esc(j.service||'—')}</td><td>${esc(techName(j.technicianId)||'—')}</td><td>${formatServiceDateTimeV12(j.startedAt)}</td><td>${formatServiceDateTimeV12(j.completedAt)}</td><td><b>${serviceDurationTextV12(j)}</b></td></tr>`).join('')||'<tr><td colspan="8">No service timing records yet.</td></tr>'
+}</tbody></table></div>`;
+}
+setInterval(renderServiceTimeReportV12,1000);
+
+/* ===== COMPLETE PRODUCTION CLEAN RESET FIX ===== */
+function productionCleanResetV12(){
+ if(!managerOk())return;
+ if(!confirm('This will delete ALL operational data and keep only staff/settings. Continue?'))return;
+ if(!confirm('FINAL CONFIRMATION: Remove tokens, incentives, dashboard data, attendance, reports and history?'))return;
+
+ const keepStaff=state.staff||[];
+ const keepSettings=state.settings||{};
+ // Explicitly preserve only staff and settings.
+ Object.keys(state).forEach(k=>{
+   if(k!=='staff' && k!=='settings') delete state[k];
+ });
+ state.staff=keepStaff;
+ state.settings=keepSettings;
+ state.jobs=[];
+ state.attendance=[];
+ state.fittingCounts={};
+ state.incentiveLocks={};
+ state.incentiveFinalized={};
+ state.tokenCounters={};
+ state.history=[];
+ state.serviceLogs=[];
+ state.completedJobs=[];
+ state.activeJob=null;
+
+ localStorage.setItem('sriHariTyresV12', JSON.stringify(state));
+ // Also clear common legacy keys that may still populate old dashboard/incentive widgets.
+ Object.keys(localStorage).forEach(k=>{
+   const key=k.toLowerCase();
+   if(key.includes('srihari')||key.includes('token')||key.includes('queue')||key.includes('incentive')||key.includes('attendance')){
+     if(k!=='sriHariTyresV12') localStorage.removeItem(k);
+   }
+ });
+ save();
+ render();
+ renderIncentivePage();
+ renderServiceTimeReportV12();
+ alert('Production Clean Reset completed successfully.\\n\\nStaff and settings kept.\\nAll operational data cleared.\\nNext token will start from 1.');
+}
+// Force every clean-data button to use the complete reset.
+document.querySelectorAll('button').forEach(b=>{
+ if(/clean|remove all test|start fresh/i.test(b.textContent||'')){
+   b.onclick=productionCleanResetV12;
+ }
+});
+
+render();
+renderServiceTimeReportV12();
+renderIncentivePage();
+</script>
+
+
+
+
+<section id="backup" class="page">
+<div class="card"><h2>💾 Backup & Restore</h2>
+<p class="small">Download a complete copy of the current system data before making major changes.</p>
+<div class="actions"><button type="button" onclick="exportBusinessBackup()">DOWNLOAD BACKUP</button><button type="button" class="dark" onclick="restoreBusinessBackup()">RESTORE BACKUP</button></div>
+<input id="restoreFile" type="file" accept=".json" style="display:none">
+<div id="backupStatus" class="small" style="margin-top:12px"></div>
+</div>
+<div class="card" style="margin-top:16px"><h2>🧹 Clean Start</h2><p class="small">Manager-only. Removes test token, attendance, completed-job, customer and appointment records while retaining staff/settings.</p><button type="button" class="red" onclick="cleanStartV11()">CLEAN TEST DATA</button></div>
+</section>
+
+
+
+<script>
+/* Firebase Authentication secure login */
+(function(){
+ function showError(m){const e=document.getElementById('frontLoginErrorFixed');if(e)e.textContent=m||'';}
+ function enterApp(){document.body.classList.remove('login-required');document.body.classList.add('login-ok');}
+ function leaveApp(){document.body.classList.remove('login-ok');document.body.classList.add('login-required');}
+ async function login(){
+   const email=(document.getElementById('frontUserFixed').value||'').trim();
+   const password=document.getElementById('frontPassFixed').value||'';
+   const btn=document.getElementById('frontLoginButtonFixed'); showError('');
+   if(!email||!password){showError('Enter your email and password.');return;}
+   if(!window.sriHariSecureAuth){showError('Secure login is loading. Please wait a moment.');return;}
+   const old=btn.textContent;btn.disabled=true;btn.textContent='SIGNING IN...';
+   try{
+     await window.sriHariSecureAuth.login(email,password);
+   }catch(e){
+     const c=e.code||'';
+     if(c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found'))showError('Incorrect email or password.');
+     else if(c.includes('operation-not-allowed'))showError('Enable Email/Password in Firebase Authentication.');
+     else showError('Login failed. Please try again.');
+   }finally{btn.disabled=false;btn.textContent=old;}
+ }
+ async function forgot(){
+   const email=(document.getElementById('frontUserFixed').value||'').trim();
+   if(!email){showError('Enter your email first, then click Forgot Password.');return;}
+   if(!window.sriHariSecureAuth){showError('Secure login is still loading.');return;}
+   try{await window.sriHariSecureAuth.reset(email);showError('Password reset email sent. Check your inbox.');}
+   catch(e){showError('Could not send reset email. Check the email address.');}
+ }
+ async function logout(){
+   if(window.sriHariSecureAuth){try{await window.sriHariSecureAuth.logout();}catch(e){}}
+   leaveApp();
+   const p=document.getElementById('frontPassFixed');if(p)p.value='';
+ }
+ window.sriHariLogout=logout;
+ function boot(){
+   document.getElementById('frontLoginButtonFixed').onclick=login;
+   document.getElementById('frontPassFixed').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+   const f=document.getElementById('forgotPasswordBtn');if(f)f.onclick=forgot;
+   window.sriHariSecureAuth.watch(async user=>{
+     if(user){
+       try{
+         const profile=await window.sriHariSecureAuth.profile(user.uid);
+         window.sriHariUser={uid:user.uid,email:user.email,name:profile.name||user.email,role:profile.role||'Manager'};
+       }catch(e){}
+       enterApp();
+     }else leaveApp();
+   });
+ }
+ document.addEventListener('DOMContentLoaded',()=>{
+   if(window.sriHariSecureAuth)boot();
+   else window.addEventListener('sriHariAuthReady',boot,{once:true});
+ });
+})();
+</script>
+</body></html>
